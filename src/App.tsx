@@ -1,0 +1,265 @@
+import "./App.css";
+import * as React from "react";
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import CssBaseline from "@mui/material/CssBaseline";
+import Divider from "@mui/material/Divider";
+import Drawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
+import InboxIcon from "@mui/icons-material/MoveToInbox";
+import List from "@mui/material/List";
+import DeleteIcon from "@mui/icons-material/Delete";
+import useMediaQuery from "@mui/material/useMediaQuery";
+
+import SettingsIcon from "@mui/icons-material/Settings";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import MailIcon from "@mui/icons-material/Mail";
+import MenuIcon from "@mui/icons-material/Menu";
+import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import ThumbDownOffAltIcon from "@mui/icons-material/ThumbDownOffAlt";
+import BlockOutlinedIcon from "@mui/icons-material/BlockOutlined";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import OnlinePredictionIcon from "@mui/icons-material/OnlinePrediction";
+import SignLanguageIcon from "@mui/icons-material/SignLanguage";
+import MessageIcon from "@mui/icons-material/Message";
+import { Avatar } from "@mui/material";
+import MatchesCard from "./Page/Mathes";
+import SearchingCriteria from "./Page/SearchingCriteria";
+import Visitors from "./Page/Visitors";
+import Likes from "./Page/Likes";
+import Blocked from "./Page/Blocked";
+import Ignored from "./Page/Ignored";
+import Messages from "./Page/Messages";
+const drawerWidth = 240;
+
+interface Props {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window?: () => Window;
+}
+
+function App(props: Props) {
+  const { window } = props;
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [isClosing, setIsClosing] = React.useState(false);
+  const [selectedMenuItem, setSelectedMenuItem] = React.useState("");
+  const matches = useMediaQuery("(max-width:600px)");
+
+  const handleMenuItemClick = (text: string) => {
+    setSelectedMenuItem(text);
+  };
+  const handleDrawerClose = () => {
+    setIsClosing(true);
+    setMobileOpen(false);
+  };
+
+  const handleDrawerTransitionEnd = () => {
+    setIsClosing(false);
+  };
+
+  const handleDrawerToggle = () => {
+    if (!isClosing) {
+      setMobileOpen(!mobileOpen);
+    }
+  };
+  const drawer = (
+    <div>
+      {matches && (
+        <Toolbar>
+          <Avatar
+            alt="Remy Sharp"
+            src="https://usrimg.quackquack.co/resize_159443301244458938835159.jpg"
+          />
+
+          <img
+            height={30}
+            src="https://cdn.logojoy.com/wp-content/uploads/2018/05/01140918/958-768x591.png"
+            alt="logo"
+            style={{ paddingLeft: "20px" }}
+          />
+          <Typography
+            sx={{ fontWeight: "bold", marginLeft: "5px", color: "#f516e6" }}
+          >
+            {"Finder"}
+          </Typography>
+          <IconButton style={{ marginLeft: "10px" }} aria-label="delete">
+            <SettingsIcon />
+          </IconButton>
+        </Toolbar>
+      )}
+
+      <Divider />
+      <List>
+        {[
+          "Matches",
+          "Search",
+          "Visitors",
+          "likes",
+          "Messages",
+          "Ignored",
+          "Blocked",
+        ].map((text, index) => (
+          <ListItem key={text} onClick={() => handleMenuItemClick(text)}>
+            <ListItemButton>
+              <ListItemIcon>
+                {/* {index % 2 === 0 ? <InboxIcon /> : <MailIcon />} */}
+                {index === 0 && <SignLanguageIcon sx={{ color: "skyblue" }} />}
+                {index === 1 && <SearchOutlinedIcon sx={{ color: "black" }} />}
+                {index === 2 && (
+                  <RemoveRedEyeIcon sx={{ color: "greenyellow" }} />
+                )}
+                {index === 3 && <FavoriteBorderIcon sx={{ color: "red" }} />}
+
+                {index === 4 && <MessageIcon sx={{ color: "blue" }} />}
+
+                {index === 5 && (
+                  <ThumbDownOffAltIcon sx={{ color: "rosybrown" }} />
+                )}
+
+                {index === 6 && <BlockOutlinedIcon sx={{ color: "orange" }} />}
+
+                {/* {index === 0 && <FavoriteBorderIcon /> } */}
+              </ListItemIcon>
+              <ListItemText primary={text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    </div>
+  );
+
+  // Remove this const when copying and pasting into your project.
+  const container =
+    window !== undefined ? () => window().document.body : undefined;
+
+  return (
+    <Box sx={{ display: "flex" }}>
+      <CssBaseline />
+      <AppBar
+        position="fixed"
+        sx={{
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          ml: { sm: `${drawerWidth}px` },
+          background:
+            "linear-gradient(90deg, rgba(255,2,254,1) 0%, rgba(140,59,247,1) 4%, rgba(225,27,254,1) 47%, rgba(198,49,254,1) 66%, rgba(254,44,207,1) 99%, rgba(24,115,240,1) 100%, rgba(155,84,254,1) 100%, rgba(0,212,255,1) 100%)",
+        }}
+      >
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={handleDrawerToggle}
+            sx={{ mr: 2, display: { sm: "none" } }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" noWrap component="div">
+            {selectedMenuItem}
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Box
+        component="nav"
+        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+        aria-label="mailbox folders"
+      >
+        <Drawer
+          container={container}
+          variant="temporary"
+          open={mobileOpen}
+          onTransitionEnd={handleDrawerTransitionEnd}
+          onClose={handleDrawerClose}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          sx={{
+            // display: { xs: 'block', sm: 'none' },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
+          }}
+        >
+          {drawer}
+        </Drawer>
+        <Drawer
+          variant="permanent"
+          sx={{
+            display: { xs: "none", sm: "block" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
+          }}
+          open
+        >
+          <Toolbar>
+            <Avatar
+              alt="Remy Sharp"
+              src="https://usrimg.quackquack.co/resize_159443301244458938835159.jpg"
+            />
+
+            <img
+              height={30}
+              src="https://cdn.logojoy.com/wp-content/uploads/2018/05/01140918/958-768x591.png"
+              alt="logo"
+              style={{ paddingLeft: "20px" }}
+            />
+            <Typography
+              sx={{ fontWeight: "bold", marginLeft: "5px", color: "#f516e6" }}
+            >
+              {"Finder"}
+            </Typography>
+            <IconButton style={{ marginLeft: "10px" }} aria-label="delete">
+              <SettingsIcon />
+            </IconButton>
+          </Toolbar>
+
+          {drawer}
+        </Drawer>
+      </Box>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+        }}
+      >
+        <Toolbar />
+        {selectedMenuItem === "Matches" && (
+          <>
+            <MatchesCard />
+          </>
+        )}
+        {selectedMenuItem === "Search" && (
+          <>
+            <SearchingCriteria />
+          </>
+        )}
+        {selectedMenuItem === "Visitors" && (
+          <>
+            <Visitors />
+          </>
+        )}
+
+        {selectedMenuItem === "likes" && <><Likes/></>}
+        {selectedMenuItem === "Messages" && <><Messages/></>}
+        {selectedMenuItem === "Ignored" && <><Ignored/></>}
+        {selectedMenuItem === "Blocked" && <><Blocked/></>}
+
+      </Box>
+    </Box>
+  );
+}
+
+export default App;
