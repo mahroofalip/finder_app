@@ -10,17 +10,17 @@ import Avatar from "@mui/material/Avatar";
 import IconButton, { IconButtonProps } from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import { red } from "@mui/material/colors";
-
+import InfoIcon from "@mui/icons-material/Info";
 import ShareIcon from "@mui/icons-material/Share";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import CancelIcon from '@mui/icons-material/Cancel';
+import CancelIcon from "@mui/icons-material/Cancel";
 import MessageOutlinedIcon from "@mui/icons-material/MessageOutlined";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import Grid from "@mui/material/Grid";
 import Badge from "@mui/material/Badge";
 import { Chip } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import FavoriteOutlinedIcon from '@mui/icons-material/FavoriteOutlined';
+import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -84,10 +84,9 @@ export default function MatchesCard() {
   const [open, setOpen] = React.useState(false);
   const [like, setLike] = React.useState(false);
 
-
-const handleLike = ()=>{
-  setLike(!like)
-}
+  const handleLike = () => {
+    setLike(!like);
+  };
   const handleClickOpenMessage = () => {
     setOpenMessage(true);
   };
@@ -105,7 +104,7 @@ const handleLike = ()=>{
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("https://randomuser.me/api/?results=5");
+        const response = await fetch("https://randomuser.me/api/?results=8");
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
@@ -153,7 +152,11 @@ const handleLike = ()=>{
                         </Badge>
                       }
                       title={
-                        <Typography variant="body1" color={'black'} fontWeight="600">
+                        <Typography
+                          variant="body1"
+                          color={"black"}
+                          fontWeight="600"
+                        >
                           {`${user.name.first} ${user.name.last}`}
                         </Typography>
                       }
@@ -173,9 +176,7 @@ const handleLike = ()=>{
                     <CardMedia
                       component="img"
                       height="250"
-                      image={
-                        user.picture.large
-                      }
+                      image={user.picture.large}
                       alt="Paella dish"
                     />
                     <CardContent sx={{ margin: 0 }}>
@@ -191,14 +192,24 @@ const handleLike = ()=>{
                       </h6>
                     </CardContent>
                     <CardActions sx={{ Padding: 0, margin: 0 }} disableSpacing>
-                      <IconButton aria-label="send message" onClick={handleClickOpenMessage}>
-                        <MessageOutlinedIcon sx={{color:"#4287f5"}}/>
+                      <IconButton
+                        aria-label="send message"
+                        onClick={handleClickOpenMessage}
+                      >
+                        <MessageOutlinedIcon sx={{ color: "#4287f5" }} />
                       </IconButton>
-                      <IconButton onClick={handleLike} aria-label="add to favorites">
-                       { !like ? <FavoriteBorderOutlinedIcon />:  <FavoriteOutlinedIcon sx={{color:"red"}} /> }
+                      <IconButton
+                        onClick={handleLike}
+                        aria-label="add to favorites"
+                      >
+                        {!like ? (
+                          <FavoriteBorderOutlinedIcon />
+                        ) : (
+                          <FavoriteOutlinedIcon sx={{ color: "red" }} />
+                        )}
                       </IconButton>
                       <IconButton aria-label="share">
-                        <CancelIcon sx={{color:"black"}}/>
+                        <CancelIcon sx={{ color: "black" }} />
                       </IconButton>
                       {/* {!matches &&} */}
 
@@ -217,7 +228,7 @@ const handleLike = ()=>{
                             onClick={handleClickOpen}
                             aria-label="info"
                           >
-                            <InfoIcon sx={{color:"#4287f5"}} />
+                            <InfoIcon sx={{ color: "#4287f5" }} />
                           </IconButton>
                         </div>
                       )}
@@ -283,11 +294,11 @@ const handleLike = ()=>{
                           </Typography>
                           <Typography variant="subtitle2">
                             <GrayLabel variant="inherit">Eye Color</GrayLabel>
-                            {'black'}
+                            {"black"}
                           </Typography>
                           <Typography variant="subtitle2">
                             <GrayLabel variant="inherit">Hair Color</GrayLabel>
-                            {'black'}
+                            {"black"}
                           </Typography>
                         </div>
 
@@ -381,8 +392,7 @@ const handleLike = ()=>{
 
           {/*  */}
 
-         
-          <div style={{display:"flex",justifyContent:"space-evenly"}}>
+          <div style={{ display: "flex", justifyContent: "space-evenly" }}>
             <Typography variant="subtitle2">
               <GrayLabel variant="inherit">Gender</GrayLabel>
               female
@@ -416,11 +426,19 @@ const handleLike = ()=>{
           {/*  */}
         </DialogContent>
         <DialogActions>
-          <Button variant="outlined" sx={{borderColor:"gray",color:"gray"}} onClick={handleClose}>Close</Button>
+          <Button
+            variant="outlined"
+            sx={{ borderColor: "gray", color: "gray" }}
+            onClick={handleClose}
+          >
+            Close
+          </Button>
         </DialogActions>
       </Dialog>
-      <ResponsiveMessageBox open={openMessage} handleClose={() => setOpenMessage(false)} />
-
+      <ResponsiveMessageBox
+        open={openMessage}
+        handleClose={() => setOpenMessage(false)}
+      />
     </>
   );
 }

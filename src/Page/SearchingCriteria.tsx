@@ -18,7 +18,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import MatchesCard from "./Mathes";
 
-function valuetext(value) {
+function valuetext(value:any) {
   return `${value}°C`;
 }
 
@@ -30,10 +30,10 @@ export default function SearchingCriteria() {
   const onSearch = () => {
     setSearch(!searched);
   };
-  const handleGender = (event) => {
+  const handleGender = (event:any) => {
     setGender(event.target.value);
   };
-  const handleChange = (event, newValue) => {
+  const handleChange = (event:any, newValue:any) => {
     setValue(newValue);
   };
 
@@ -56,7 +56,8 @@ export default function SearchingCriteria() {
             columnSpacing={{ xs: 1, sm: 2, md: 3 }}
           >
             <Grid item sm={12} xs={12} lg={6}>
-              <Typography align="end">
+              <Typography > 
+              {/* align="end" */}
                 {value[0]} - {value[1]}{" "}
               </Typography>
               <Slider
@@ -87,7 +88,7 @@ export default function SearchingCriteria() {
               />
             </Grid>
             <Grid item sm={12} xs={12} lg={6}>
-              <FormControl fullWidth size="">
+              <FormControl fullWidth >
                 <InputLabel id="demo-select-small-label">Gender</InputLabel>
                 <Select
                   labelId="demo-select-small-label"

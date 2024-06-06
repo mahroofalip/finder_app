@@ -8,9 +8,22 @@ import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import ChatPage from './ChatPage';
 
-export default function Messages() {
-  const [users, setUsers] = React.useState([]);
-  const [selectedUser, setSelectedUser] = React.useState(null);
+interface User {
+  name: {
+    first: string;
+    last: string;
+  };
+  dob: {
+    age: number;
+  };
+  picture: {
+    large: string;
+  };
+}
+
+const Messages: React.FC = () => {
+  const [users, setUsers] = React.useState<User[]>([]);
+  const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -20,7 +33,7 @@ export default function Messages() {
           throw new Error("Network response was not ok");
         }
         const jsonData = await response.json();
-        setUsers(jsonData?.results);
+        setUsers(jsonData.results);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -28,10 +41,10 @@ export default function Messages() {
     fetchData();
   }, []);
 
-  const handleUserClick = (user) => {
-    setSelectedUser(true);
+  const handleUserClick = (user: User) => {
+    setSelectedUser(user);
   };
-  
+
   return (
     <>
       {selectedUser ? (
@@ -40,7 +53,11 @@ export default function Messages() {
         <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
           {users.map((user, index) => (
             <React.Fragment key={index}>
-              <ListItem alignItems="flex-start" sx={{ cursor: 'pointer' }} onClick={() => handleUserClick(user)}>
+              <ListItem
+                alignItems="flex-start"
+                sx={{ cursor: 'pointer' }}
+                onClick={() => handleUserClick(user)}
+              >
                 <ListItemAvatar>
                   <Avatar alt={user.name.first} src={user.picture.large} />
                 </ListItemAvatar>
@@ -55,7 +72,7 @@ export default function Messages() {
                           variant="body2"
                           color="gray"
                         >
-                          You:   {" How Are you ?"}
+                          You: {" How Are you ?"}
                         </Typography>
                         <Typography
                           sx={{ display: 'inline' }}
@@ -77,4 +94,6 @@ export default function Messages() {
       )}
     </>
   );
-}
+};
+
+export default Messages;

@@ -9,8 +9,6 @@ import {
   Avatar,
   Box,
   Button,
-  DialogActions,
-  DialogContentText,
   IconButton,
   InputAdornment,
   TextField,

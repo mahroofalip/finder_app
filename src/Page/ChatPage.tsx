@@ -40,7 +40,7 @@ const OfflineBadge = () => (
     }}
   />
 );
-export default function ChatPage() {
+export default function ChatPage(props:any) {
   return (
     <>
       <Box style={{ border: "1px solid #ded9d9", borderRadius: "5px" }}>
@@ -100,10 +100,8 @@ export default function ChatPage() {
                 alignSelf: "flex-start",
                 backgroundColor: "white",
                 padding: 5,
-                paddingLeft: 15,
                 paddingRight: 15,
                 paddingLeft: 15,
-                paddingRight: 15,
                 marginBottom: 5,
                 borderRadius: 5,
                 border: "1px solid #ded9d9",
