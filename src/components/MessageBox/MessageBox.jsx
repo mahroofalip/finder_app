@@ -28,11 +28,13 @@ export default function ResponsiveMessageBox(props) {
   function submitMessage() {
     setMessage("");
     setDisable(true);
+    setShowError(false)
   }
   function resetStates(){
     setDisable(false);
     setMessage('Hi')
   }
+  
   return (
     <Dialog
       fullScreen={fullScreen}
@@ -96,6 +98,7 @@ export default function ResponsiveMessageBox(props) {
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton
+
                     onClick={submitMessage}
                     aria-label="toggle password visibility"
                   >

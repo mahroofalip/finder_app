@@ -11,7 +11,6 @@ import IconButton, { IconButtonProps } from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import { red } from "@mui/material/colors";
 import InfoIcon from "@mui/icons-material/Info";
-import ShareIcon from "@mui/icons-material/Share";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CancelIcon from "@mui/icons-material/Cancel";
 import MessageOutlinedIcon from "@mui/icons-material/MessageOutlined";
@@ -127,11 +126,11 @@ export default function MatchesCard() {
   return (
     <>
       <Grid container spacing={2}>
-        {users.length != 0 &&
+        {users.length !== 0 &&
           users?.map((user, index) => {
             return (
               <>
-                <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+                <Grid key={`key${index}`} item xs={12} sm={6} md={4} lg={4} xl={3}>
                   <Card sx={{ maxWidth: "100%" }}>
                     <CardHeader
                       avatar={
@@ -169,7 +168,7 @@ export default function MatchesCard() {
                             vertical: "bottom",
                             horizontal: "right",
                           }}
-                          badgeContent={<OnlineBadge />}
+                          badgeContent={ user.registered > 30 ? <OnlineBadge /> : <OfflineBadge/>}
                         ></Badge>
                       }
                     />
@@ -193,6 +192,7 @@ export default function MatchesCard() {
                     </CardContent>
                     <CardActions sx={{ Padding: 0, margin: 0 }} disableSpacing>
                       <IconButton
+                       
                         aria-label="send message"
                         onClick={handleClickOpenMessage}
                       >
@@ -317,11 +317,7 @@ export default function MatchesCard() {
         open={open}
         onClose={handleClose}
       >
-        {/* <DialogTitle align="center">Profile Information</DialogTitle> */}
         <DialogContent>
-          {/* <DialogContentText>
-            You can set my maximum width and whether to adapt or not.
-          </DialogContentText> */}
           <Box
             sx={{
               display: "flex",
@@ -439,6 +435,7 @@ export default function MatchesCard() {
         open={openMessage}
         handleClose={() => setOpenMessage(false)}
       />
+  
     </>
   );
 }

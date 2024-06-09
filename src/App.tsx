@@ -6,17 +6,13 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
 import List from "@mui/material/List";
-import DeleteIcon from "@mui/icons-material/Delete";
 import useMediaQuery from "@mui/material/useMediaQuery";
-
 import SettingsIcon from "@mui/icons-material/Settings";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import MailIcon from "@mui/icons-material/Mail";
 import MenuIcon from "@mui/icons-material/Menu";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
@@ -25,7 +21,6 @@ import BlockOutlinedIcon from "@mui/icons-material/BlockOutlined";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import OnlinePredictionIcon from "@mui/icons-material/OnlinePrediction";
 import SignLanguageIcon from "@mui/icons-material/SignLanguage";
 import MessageIcon from "@mui/icons-material/Message";
 import { Avatar } from "@mui/material";
@@ -36,13 +31,14 @@ import Likes from "./Page/Likes";
 import Blocked from "./Page/Blocked";
 import Ignored from "./Page/Ignored";
 import Messages from "./Page/Messages";
+import Login from "./Page/Login";
+import Register from "./Page/Register";
+import LoginIcon from '@mui/icons-material/Login';
+
+
 const drawerWidth = 240;
 
 interface Props {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * Remove this when copying and pasting into your project.
-   */
   window?: () => Window;
 }
 
@@ -50,11 +46,37 @@ function App(props: Props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
+  const [isLoggedIn, setLoggedIn] = React.useState(false);
+  const [isAccountCreated, setAccountCreated] = React.useState(true);
+
   const [selectedMenuItem, setSelectedMenuItem] = React.useState("");
   const matches = useMediaQuery("(max-width:600px)");
 
+
+  const handleRegisterSubmit = (data: { password: string; phone: string }) => {
+    const { password, phone, } = data;
+    const email = 'a@gmail.com';
+  };
+
+  const handleLoginSubmit = (data: { email: string; password: string }) => {
+    setSelectedMenuItem('Matches');
+  };
+
+  const displaySignUp = () => {
+    setSelectedMenuItem('Matches');
+    setAccountCreated(false)
+  }
+  const displayLogin = () => {
+    setAccountCreated(true)
+  }
+
   const handleMenuItemClick = (text: string) => {
-    setSelectedMenuItem(text);
+    if(text==="Logout"){
+      setLoggedIn(false)
+      setSelectedMenuItem('');
+    }else{
+      setSelectedMenuItem(text);
+    }
   };
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -106,11 +128,11 @@ function App(props: Props) {
           "Messages",
           "Ignored",
           "Blocked",
+          "Logout",
         ].map((text, index) => (
           <ListItem key={text} onClick={() => handleMenuItemClick(text)}>
             <ListItemButton>
               <ListItemIcon>
-                {/* {index % 2 === 0 ? <InboxIcon /> : <MailIcon />} */}
                 {index === 0 && <SignLanguageIcon sx={{ color: "skyblue" }} />}
                 {index === 1 && <SearchOutlinedIcon sx={{ color: "black" }} />}
                 {index === 2 && (
@@ -126,7 +148,7 @@ function App(props: Props) {
 
                 {index === 6 && <BlockOutlinedIcon sx={{ color: "orange" }} />}
 
-                {/* {index === 0 && <FavoriteBorderIcon /> } */}
+                {index === 7 && <LoginIcon sx={{ color: "black" }}/> }
               </ListItemIcon>
               <ListItemText primary={text} />
             </ListItemButton>
@@ -140,7 +162,7 @@ function App(props: Props) {
   const container =
     window !== undefined ? () => window().document.body : undefined;
 
-  return (
+  return isLoggedIn ? (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <AppBar
@@ -252,14 +274,62 @@ function App(props: Props) {
           </>
         )}
 
-        {selectedMenuItem === "likes" && <><Likes/></>}
-        {selectedMenuItem === "Messages" && <><Messages/></>}
-        {selectedMenuItem === "Ignored" && <><Ignored/></>}
-        {selectedMenuItem === "Blocked" && <><Blocked/></>}
-
+        {selectedMenuItem === "likes" && (
+          <>
+            <Likes />
+          </>
+        )}
+        {selectedMenuItem === "Messages" && (
+          <>
+            <Messages />
+          </>
+        )}
+        {selectedMenuItem === "Ignored" && (
+          <>
+            <Ignored />
+          </>
+        )}
+        {selectedMenuItem === "Blocked" && (
+          <>
+            <Blocked />
+          </>
+        )}
       </Box>
     </Box>
+  ) : (
+    <>
+      <Box sx={{ display: "flex" }}>
+        <AppBar
+          position="fixed"
+          sx={{
+            height: "10%",
+            background:
+              "linear-gradient(90deg, rgba(255,2,254,1) 0%, rgba(140,59,247,1) 4%, rgba(225,27,254,1) 47%, rgba(198,49,254,1) 66%, rgba(254,44,207,1) 99%, rgba(24,115,240,1) 100%, rgba(155,84,254,1) 100%, rgba(0,212,255,1) 100%)",
+          }}
+        >
+          {/* <span className="loginPageNav">Finder</span> */}
+        </AppBar>
+
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            p: 3,
+            width: { sm: `calc(100% - ${drawerWidth}px)` },
+          }}
+        >
+          <Toolbar />
+          {!isAccountCreated ? (
+           <Register showLoginPage={displayLogin} signUpSubmit={handleRegisterSubmit} />
+          ) : ( 
+           <Login showRegisterPage={displaySignUp} loginSubmit={handleLoginSubmit} />
+          )}
+        </Box>
+      </Box>
+    </>
   );
 }
 
 export default App;
+
+
