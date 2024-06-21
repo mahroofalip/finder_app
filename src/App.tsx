@@ -34,6 +34,10 @@ import Messages from "./Page/Messages";
 import Login from "./Page/Login";
 import Register from "./Page/Register";
 import LoginIcon from '@mui/icons-material/Login';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from './store';
+import { loginUser, logoutUser, registerUser } from "./userSlice";
+import Loader from './ButtonWithLoader'; // Your loader component
 
 
 const drawerWidth = 240;
@@ -43,23 +47,53 @@ interface Props {
 }
 
 function App(props: Props) {
+
+  const dispatch: AppDispatch = useDispatch();
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
   const [isLoggedIn, setLoggedIn] = React.useState(false);
   const [isAccountCreated, setAccountCreated] = React.useState(true);
-
   const [selectedMenuItem, setSelectedMenuItem] = React.useState("");
   const matches = useMediaQuery("(max-width:600px)");
 
 
-  const handleRegisterSubmit = (data: { password: string; phone: string }) => {
-    const { password, phone, } = data;
-    const email = 'a@gmail.com';
+  const user = useSelector((state: RootState) => state.user.user);
+
+  React.useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    if (token || user?.status==="success") {
+      setLoggedIn(true);
+    }else{
+      setLoggedIn(false);
+    }
+  }, [user]);
+
+  const handleRegisterSubmit = (data: {firstName:string,lastName:string,email:string, password: string; phone: string }) => {
+    const { password, phone,email,firstName,lastName } = data;
+    const userData:any = {
+      firstName: firstName,
+      lastName: lastName,
+      phone:phone,
+      email: email,
+      password:password
+    };
+    dispatch(registerUser(userData));
   };
 
-  const handleLoginSubmit = (data: { email: string; password: string }) => {
-    setSelectedMenuItem('Matches');
+  const handleLoginSubmit = (data: { email:string, password: string}) => {
+
+    
+    const { password, email  } = data;
+
+    console.log(password,"password");
+
+    const userData:any = {
+      password,
+      email,
+    };
+    dispatch(loginUser(userData));
   };
 
   const displaySignUp = () => {
@@ -73,6 +107,7 @@ function App(props: Props) {
   const handleMenuItemClick = (text: string) => {
     if(text==="Logout"){
       setLoggedIn(false)
+      dispatch(logoutUser());
       setSelectedMenuItem('');
     }else{
       setSelectedMenuItem(text);
@@ -307,9 +342,7 @@ function App(props: Props) {
               "linear-gradient(90deg, rgba(255,2,254,1) 0%, rgba(140,59,247,1) 4%, rgba(225,27,254,1) 47%, rgba(198,49,254,1) 66%, rgba(254,44,207,1) 99%, rgba(24,115,240,1) 100%, rgba(155,84,254,1) 100%, rgba(0,212,255,1) 100%)",
           }}
         >
-          {/* <span className="loginPageNav">Finder</span> */}
         </AppBar>
-
         <Box
           component="main"
           sx={{
@@ -320,6 +353,7 @@ function App(props: Props) {
         >
           <Toolbar />
           {!isAccountCreated ? (
+            
            <Register showLoginPage={displayLogin} signUpSubmit={handleRegisterSubmit} />
           ) : ( 
            <Login showRegisterPage={displaySignUp} loginSubmit={handleLoginSubmit} />

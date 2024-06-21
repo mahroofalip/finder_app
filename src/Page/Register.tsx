@@ -1,6 +1,5 @@
 import * as React from "react";
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
@@ -10,6 +9,9 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import ButtonWithLoader from "../ButtonWithLoader";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
 
 function Copyright(props: any) {
   return (
@@ -31,12 +33,20 @@ function Copyright(props: any) {
 
 interface RegisterProps {
   showLoginPage: () => void;
-  signUpSubmit: (data: { password: string; phone: string }) => void;
+  signUpSubmit: (data: {
+    firstName: string;
+    email: string;
+    lastName: string;
+    password: string;
+    phone: string;
+  }) => void;
 }
 
 const defaultTheme = createTheme();
 const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
-  
+  const  {user,loading}= useSelector((state: RootState) => state.user);
+  const  state = useSelector((state: RootState) => state);
+
   const [formErrors, setFormErrors] = React.useState({
     firstName: "",
     lastName: "",
@@ -59,7 +69,8 @@ const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
   };
 
   const validatePassword = (password: string) => {
-    const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const re =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     return re.test(password);
   };
 
@@ -92,9 +103,10 @@ const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
     // Validate password
     if (!data.password) {
       errors.password = "Password is required";
-    } else if (!validatePassword(data.password)) {
-      errors.password =
-        "Password must contain at least 8 characters, including uppercase, lowercase, number, and special character";
+
+      // else if (!validatePassword(data.password)) {
+      //   errors.password =
+      //     "Password must contain at least 8 characters, including uppercase, lowercase, number, and special character";
     } else {
       errors.password = "";
     }
@@ -122,13 +134,17 @@ const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
       password: formData.get("password") as string,
       phone: formData.get("phone") as string,
     };
-
     const errors = validateForm(data);
     setFormErrors(errors);
-
     const hasErrors = Object.values(errors).some((error) => error !== "");
     if (!hasErrors && signUpSubmit) {
-      signUpSubmit({ phone: data.phone, password: data.password });
+      signUpSubmit({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        password: data.password,
+      });
     }
     setTouched({
       firstName: true,
@@ -139,7 +155,9 @@ const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
     });
   };
 
-  const handleBlur = (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleBlur = (
+    event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name } = event.target;
     setTouched((prevTouched) => ({
       ...prevTouched,
@@ -172,14 +190,15 @@ const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
-          {/* {JSON.stringify(formErrors)}    */}
+
+            {/* {JSON.stringify(state)} */}
+
+            {user?.status === "exist" ?  <small className="red-text"> {user?.message} </small>: "" }
 
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-
-
-                  <TextField
+                <TextField
                   autoComplete="given-name"
                   name="firstName"
                   fullWidth
@@ -216,7 +235,6 @@ const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
                     },
                   }}
                 />
-
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -239,7 +257,6 @@ const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  
                   fullWidth
                   name="password"
                   label="Password"
@@ -260,7 +277,6 @@ const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  
                   fullWidth
                   name="phone"
                   label="Phone Number"
@@ -282,14 +298,17 @@ const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
                 />
               </Grid>
             </Grid>
-            <Button
-              type="submit"
-              fullWidth
+
+            <ButtonWithLoader
+              loading={loading}
+              fullWidth={true}
               variant="contained"
+              type="submit"
               sx={{ mt: 3, mb: 2 }}
             >
               Sign Up
-            </Button>
+            </ButtonWithLoader>
+
             <Grid item>
               <Typography
                 variant="body2"

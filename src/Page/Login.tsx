@@ -12,6 +12,9 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import ButtonWithLoader from '../ButtonWithLoader';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
 function Copyright(props: any) {
   return (
@@ -27,21 +30,39 @@ function Copyright(props: any) {
 }
 interface LoginProps {
   showRegisterPage: () => void;
-
-  loginSubmit: (data: { password: string; email: string }) => void;
+  loginSubmit: (data: { 
+    email: string;
+    password: string;
+  }) => void;
 
 }
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 const Login:React.FC<LoginProps> = ({ showRegisterPage,loginSubmit }) => {
+
+
+  const loading = useSelector((state: RootState) => state.user.loading);
+  
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     const formData = new FormData(event.currentTarget);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
+    const data = {
+      email: formData.get("email") as string,
+      password: formData.get("password") as string,
+    };
+    // validateForm(data)
+    const errors = null;
+
+    // setFormErrors(errors);
+    // const hasErrors = Object.values(errors).some((error) => error !== "");
+    const hasErrors = false;
     if (loginSubmit) {
-      loginSubmit({password, email });
+      loginSubmit({
+        email:data.email,
+        password: data.password,
+       });
     }
   };
 
@@ -85,12 +106,10 @@ const Login:React.FC<LoginProps> = ({ showRegisterPage,loginSubmit }) => {
               margin="normal"
               required
               fullWidth
-              
               name="password"
               label="Password"
               type="password"
               id="password"
-              
               autoComplete="current-password"
               InputLabelProps={{
                 sx: {
@@ -104,14 +123,16 @@ const Login:React.FC<LoginProps> = ({ showRegisterPage,loginSubmit }) => {
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
             />
-            <Button
-              type="submit"
-              fullWidth
+              <ButtonWithLoader
+              loading={loading}
+              fullWidth={true}
               variant="contained"
+              type="submit"
               sx={{ mt: 3, mb: 2 }}
             >
               Sign In
-            </Button>
+            </ButtonWithLoader>
+            
             <Grid container>
               <Grid item xs>
                 <Link href="#" variant="body2">
