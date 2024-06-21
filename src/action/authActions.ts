@@ -1,8 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AppDispatch, User, UserState } from './store';
-import axios from 'axios';
 
-const initialState: UserState = {
+import axios from 'axios';
+import { AppDispatch, User, AuthState } from '../store';
+
+const initialState: AuthState = {
     user: null,
     loading: false,
     error: null,
@@ -55,7 +56,7 @@ export const { loginStart, loginSuccess, loginFailure, registerStart, registerSu
 export const loginUser = (userData: User) => async (dispatch: AppDispatch) => {
     dispatch(loginStart());
     try {
-        const response = await axios.post('http://localhost:5000/api/users/login', userData, {
+        const response = await axios.post('http://localhost:5000/api/auth/login', userData, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -71,7 +72,7 @@ export const loginUser = (userData: User) => async (dispatch: AppDispatch) => {
 export const registerUser = (userData: User) => async (dispatch: AppDispatch) => {
     dispatch(registerStart());
     try {
-        const response = await axios.post('http://localhost:5000/api/users/register', userData, {
+        const response = await axios.post('http://localhost:5000/api/auth/register', userData, {
             headers: {
                 'Content-Type': 'application/json',
             },

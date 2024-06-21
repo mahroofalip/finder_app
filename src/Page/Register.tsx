@@ -44,7 +44,7 @@ interface RegisterProps {
 
 const defaultTheme = createTheme();
 const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
-  const  {user,loading}= useSelector((state: RootState) => state.user);
+  const  {user,loading}= useSelector((state: RootState) => state.auth);
   const  state = useSelector((state: RootState) => state);
 
   const [formErrors, setFormErrors] = React.useState({

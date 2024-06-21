@@ -28,6 +28,10 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 
 import ResponsiveMessageBox from "../components/MessageBox/MessageBox";
+import { loadFinderUsers } from "../action/usersAction";
+import { useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "../store";
+import { useSelector } from "react-redux";
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -75,9 +79,15 @@ const OfflineBadge = () => (
 type ExpandedProfiles = boolean[];
 
 export default function MatchesCard() {
+
+  const dispatch: AppDispatch = useDispatch();
+  const messagesList = useSelector((state: RootState) => state.users.users);
+  const loading = useSelector((state: RootState) => state.users.loading);
+  const error = useSelector((state: RootState) => state.users.error);
+
   const [expandedProfiles, setExpandedProfiles] =
     React.useState<ExpandedProfiles>([]);
-  const [users, setUsers] = React.useState<any[]>([]);
+  // const [users, setUsers] = React.useState<any[]>([]);
   const matches = useMediaQuery("(max-width:600px)");
 
   const [open, setOpen] = React.useState(false);
@@ -101,20 +111,24 @@ export default function MatchesCard() {
   };
 
   React.useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("https://randomuser.me/api/?results=8");
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const jsonData = await response.json();
-        setUsers(jsonData?.results);
-        setExpandedProfiles(new Array(jsonData?.results.length).fill(false));
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchData();
+
+
+    dispatch(loadFinderUsers()); // Fetch users from your backend
+
+    // const fetchData = async () => {
+    //   try {
+    //     const response = await fetch("https://randomuser.me/api/?results=8");
+    //     if (!response.ok) {
+    //       throw new Error("Network response was not ok");
+    //     }
+    //     const jsonData = await response.json();
+    //     setUsers(jsonData?.results);
+    //     setExpandedProfiles(new Array(jsonData?.results.length).fill(false));
+    //   } catch (error) {
+    //     console.error("Error fetching data:", error);
+    //   }
+    // };
+    // fetchData();
   }, []);
 
   const handleExpandClick = (index: number) => {
@@ -126,8 +140,8 @@ export default function MatchesCard() {
   return (
     <>
       <Grid container spacing={2}>
-        {users.length !== 0 &&
-          users?.map((user, index) => {
+        {messagesList.length !== 0 &&
+          messagesList?.map((user, index) => {
             return (
               <>
                 <Grid key={`key${index}`} item xs={12} sm={6} md={4} lg={4} xl={3}>
@@ -144,7 +158,7 @@ export default function MatchesCard() {
                           <Avatar
                             sx={{ bgcolor: red[500] }}
                             aria-label="recipe"
-                            src={user.picture.thumbnail}
+                            src={'user'}
                           >
                             {/* R */}
                           </Avatar>
@@ -156,10 +170,10 @@ export default function MatchesCard() {
                           color={"black"}
                           fontWeight="600"
                         >
-                          {`${user.name.first} ${user.name.last}`}
+                          {`${user.firstName} ${user.lastName}`}
                         </Typography>
                       }
-                      subheader={`${user.registered.age} Min ago`}
+                      subheader={`${user.age} Min ago`}
                       action={
                         <Badge
                           style={{ marginRight: 12 }}
@@ -168,19 +182,19 @@ export default function MatchesCard() {
                             vertical: "bottom",
                             horizontal: "right",
                           }}
-                          badgeContent={ user.registered > 30 ? <OnlineBadge /> : <OfflineBadge/>}
+                          badgeContent={ user.isOnline  ? <OnlineBadge /> : <OfflineBadge/>}
                         ></Badge>
                       }
                     />
                     <CardMedia
                       component="img"
                       height="250"
-                      image={user.picture.large}
+                      image={user?.profileImage}
                       alt="Paella dish"
                     />
                     <CardContent sx={{ margin: 0 }}>
                       <h5 style={{ padding: 0, margin: 0 }}>
-                        Age: {user.dob.age}, {user.location.city}
+                        Age: {user.age}, {user.city}
                       </h5>
                       <h6 style={{ padding: 0, margin: 0 }}>
                         Working in Legal Professional
@@ -271,14 +285,14 @@ export default function MatchesCard() {
                         <Typography variant="h6" paragraph>
                           Basic Info:
                         </Typography>
-                        <div key={user.login.uuid}>
+                        <div key={user.id}>
                           <Typography variant="subtitle2">
                             <GrayLabel variant="inherit">Gender</GrayLabel>
                             {user["gender"]}
                           </Typography>
                           <Typography variant="subtitle2">
                             <GrayLabel variant="inherit">Username</GrayLabel>
-                            {user["username"]}
+                            {user["userName"]}
                           </Typography>
                           <Typography variant="subtitle2">
                             <GrayLabel variant="inherit">DOB</GrayLabel>
@@ -294,11 +308,11 @@ export default function MatchesCard() {
                           </Typography>
                           <Typography variant="subtitle2">
                             <GrayLabel variant="inherit">Eye Color</GrayLabel>
-                            {"black"}
+                            {user["eyeColor"]}
                           </Typography>
                           <Typography variant="subtitle2">
                             <GrayLabel variant="inherit">Hair Color</GrayLabel>
-                            {"black"}
+                            {user["hairColor"]}
                           </Typography>
                         </div>
 

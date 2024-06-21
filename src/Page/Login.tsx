@@ -42,7 +42,7 @@ const defaultTheme = createTheme();
 const Login:React.FC<LoginProps> = ({ showRegisterPage,loginSubmit }) => {
 
 
-  const loading = useSelector((state: RootState) => state.user.loading);
+  const loading = useSelector((state: RootState) => state.auth.loading);
   
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

@@ -33,12 +33,10 @@ import Ignored from "./Page/Ignored";
 import Messages from "./Page/Messages";
 import Login from "./Page/Login";
 import Register from "./Page/Register";
-import LoginIcon from '@mui/icons-material/Login';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState, AppDispatch } from './store';
-import { loginUser, logoutUser, registerUser } from "./userSlice";
-import Loader from './ButtonWithLoader'; // Your loader component
-
+import LoginIcon from "@mui/icons-material/Login";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "./store";
+import { loginUser, logoutUser, registerUser } from "./action/authActions";
 
 const drawerWidth = 240;
 
@@ -47,7 +45,6 @@ interface Props {
 }
 
 function App(props: Props) {
-
   const dispatch: AppDispatch = useDispatch();
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -57,59 +54,62 @@ function App(props: Props) {
   const [selectedMenuItem, setSelectedMenuItem] = React.useState("");
   const matches = useMediaQuery("(max-width:600px)");
 
+  const user = useSelector((state: RootState) => state.auth.user);
 
-  const user = useSelector((state: RootState) => state.user.user);
 
   React.useEffect(() => {
-    const token = localStorage.getItem('token');
-
-    if (token || user?.status==="success") {
+    const token = localStorage.getItem("token");
+    if (token || user?.status === "success") {
       setLoggedIn(true);
-    }else{
+    } else {
       setLoggedIn(false);
     }
-  }, [user]);
+  }, [user, dispatch]);
 
-  const handleRegisterSubmit = (data: {firstName:string,lastName:string,email:string, password: string; phone: string }) => {
-    const { password, phone,email,firstName,lastName } = data;
-    const userData:any = {
+  const handleRegisterSubmit = (data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    phone: string;
+  }) => {
+    const { password, phone, email, firstName, lastName } = data;
+    const userData: any = {
       firstName: firstName,
       lastName: lastName,
-      phone:phone,
+      phone: phone,
       email: email,
-      password:password
+      password: password,
     };
     dispatch(registerUser(userData));
   };
 
-  const handleLoginSubmit = (data: { email:string, password: string}) => {
-
-    
-    const { password, email  } = data;
-
-    console.log(password,"password");
-
-    const userData:any = {
+  const handleLoginSubmit = (data: { email: string; password: string }) => {
+    const { password, email } = data;
+    const userData: any = {
       password,
       email,
     };
+
+    console.log(userData, "userData kkkkkkkkkkkkkkkkkkkkkk start");
+
     dispatch(loginUser(userData));
   };
 
   const displaySignUp = () => {
-    setSelectedMenuItem('Matches');
-    setAccountCreated(false)
-  }
+    setSelectedMenuItem("Matches");
+    setAccountCreated(false);
+  };
   const displayLogin = () => {
-    setAccountCreated(true)
-  }
+    setAccountCreated(true);
+  };
 
   const handleMenuItemClick = (text: string) => {
-    if(text==="Logout"){
-      setLoggedIn(false)
+    if (text === "Logout") {
+      setLoggedIn(false);
       dispatch(logoutUser());
-      setSelectedMenuItem('');
-    }else{
+      setSelectedMenuItem("");
+    } else {
       setSelectedMenuItem(text);
     }
   };
@@ -183,7 +183,7 @@ function App(props: Props) {
 
                 {index === 6 && <BlockOutlinedIcon sx={{ color: "orange" }} />}
 
-                {index === 7 && <LoginIcon sx={{ color: "black" }}/> }
+                {index === 7 && <LoginIcon sx={{ color: "black" }} />}
               </ListItemIcon>
               <ListItemText primary={text} />
             </ListItemButton>
@@ -341,8 +341,7 @@ function App(props: Props) {
             background:
               "linear-gradient(90deg, rgba(255,2,254,1) 0%, rgba(140,59,247,1) 4%, rgba(225,27,254,1) 47%, rgba(198,49,254,1) 66%, rgba(254,44,207,1) 99%, rgba(24,115,240,1) 100%, rgba(155,84,254,1) 100%, rgba(0,212,255,1) 100%)",
           }}
-        >
-        </AppBar>
+        ></AppBar>
         <Box
           component="main"
           sx={{
@@ -353,10 +352,15 @@ function App(props: Props) {
         >
           <Toolbar />
           {!isAccountCreated ? (
-            
-           <Register showLoginPage={displayLogin} signUpSubmit={handleRegisterSubmit} />
-          ) : ( 
-           <Login showRegisterPage={displaySignUp} loginSubmit={handleLoginSubmit} />
+            <Register
+              showLoginPage={displayLogin}
+              signUpSubmit={handleRegisterSubmit}
+            />
+          ) : (
+            <Login
+              showRegisterPage={displaySignUp}
+              loginSubmit={handleLoginSubmit}
+            />
           )}
         </Box>
       </Box>
@@ -365,5 +369,3 @@ function App(props: Props) {
 }
 
 export default App;
-
-
