@@ -2,10 +2,12 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { AppDispatch, Message, MessageState } from '../store';
+import { AppDispatch, Chat, Message, MessageState } from '../store';
+
 
 const initialState: MessageState = {
     messages: [],
+    chat:null,
     loading: false,
     error: null,
 };
@@ -41,6 +43,19 @@ const messageSlice = createSlice({
             state.loading = false;
             state.error = action.payload;
         },
+        createRoomStart: (state) => {
+            state.loading = true;
+            state.error = null;
+        },
+        createRoomSuccess: (state, action: PayloadAction<Chat>) => {
+            state.loading = false;
+            state.chat = action.payload;
+        },
+        createRoomFailure: (state, action: PayloadAction<string>) => {
+            state.loading = false;
+            state.error = action.payload;
+        },
+    
     },
 });
 
@@ -52,6 +67,9 @@ export const {
     loadUserChatsStart,
     loadUserChatsSuccess,
     loadUserChatsFailure,
+    createRoomStart,
+    createRoomSuccess,
+    createRoomFailure
 } = messageSlice.actions;
 
 export const sendMessage = (messageData: Message) => async (dispatch: AppDispatch) => {
@@ -86,5 +104,25 @@ export const loadUserChats = () => async (dispatch: AppDispatch) => {
         dispatch(loadUserChatsFailure(error.message));
     }
 };
+export const createRoom = (sender_id : any,receiver_id:any,message_content:any) => async (dispatch: AppDispatch) => {
+    dispatch(createRoomStart());
+    try {
+        const token = localStorage.getItem('token'); 
+
+        console.log(receiver_id,"step receiver_id");
+        console.log(sender_id,"step sender_id");
+
+        const response = await axios.post('http://localhost:5000/api/messages/createRoomAndSendMessage', {receiver_id,sender_id,message_content}, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Include the token in the Authorization header
+            },
+        });
+        dispatch(createRoomSuccess(response.data));
+    } catch (error: any) {
+        dispatch(createRoomFailure(error.message));
+    }
+};
+
 
 export default messageSlice.reducer;

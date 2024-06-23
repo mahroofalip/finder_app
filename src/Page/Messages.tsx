@@ -7,10 +7,11 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import ChatPage from "./ChatPage";
-import {  loadUserChats } from "../action/messageActions";
+import { loadUserChats, receiveMessage } from "../action/messageActions";
 import { useDispatch } from "react-redux";
-import { AppDispatch, RootState } from "../store";
+import { AppDispatch, Message, RootState } from "../store";
 import { useSelector } from "react-redux";
+import socket from "../socket.ts/socket";
 
 interface User {
   name: {
@@ -27,9 +28,7 @@ interface User {
 
 const Messages: React.FC = () => {
   // const [users, setUsers] = React.useState<User[]>([]);
-  const userMessages = useSelector(
-    (state: RootState) => state.message.messages
-  );
+  const chatRooms = useSelector((state: RootState) => state.message.messages);
 
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
   const dispatch: AppDispatch = useDispatch();
@@ -53,6 +52,21 @@ const Messages: React.FC = () => {
   // fetchData();
   // }, []);
 
+  React.useEffect(() => {
+    socket.on("receive-message", (data: Message) => {
+      // alert('ok')
+      dispatch(loadUserChats()); // Fetch users from your backend
+
+      // console.log("Message received:", data);
+      // dispatch(receiveMessage(data));
+    });
+
+    return () => {
+      socket.off("receive-message");
+      socket.disconnect();
+    };
+  }, [dispatch]);
+
   const handleUserClick = (user: User) => {
     setSelectedUser(user);
   };
@@ -63,20 +77,20 @@ const Messages: React.FC = () => {
         <ChatPage user={selectedUser} onClose={() => setSelectedUser(null)} />
       ) : (
         <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-          {JSON.stringify(userMessages)}
+          {/* {JSON.stringify(chatRooms[0].Receiver.firstName)} */}
 
-          {userMessages.map((user: any, index: any) => (
+          {chatRooms.map((chat: any, index: any) => (
             <React.Fragment key={index}>
               <ListItem
                 alignItems="flex-start"
                 sx={{ cursor: "pointer" }}
-                onClick={() => handleUserClick(user)}
+                onClick={() => handleUserClick(chat)}
               >
                 <ListItemAvatar>
-                  <Avatar alt={user.name.first} src={user.picture.large} />
+                  <Avatar alt={""} src={chat.Receiver.profileImage} />
                 </ListItemAvatar>
                 <ListItemText
-                  primary={`${user.name.first} ${user.name.last}, ${user.dob.age}`}
+                  primary={`${chat?.Receiver?.firstName} ${chat?.Receiver?.lastName}, ${chat?.Receiver?.age}`}
                   secondary={
                     <React.Fragment>
                       <div
@@ -91,7 +105,7 @@ const Messages: React.FC = () => {
                           variant="body2"
                           color="gray"
                         >
-                          You: {" How Are you ?"}
+                          You: {chat.last_message_content}
                         </Typography>
                         <Typography
                           sx={{ display: "inline" }}
@@ -106,7 +120,7 @@ const Messages: React.FC = () => {
                   }
                 />
               </ListItem>
-              {index < userMessages.length - 1 && (
+              {index < chatRooms.length - 1 && (
                 <Divider variant="inset" component="li" />
               )}
             </React.Fragment>

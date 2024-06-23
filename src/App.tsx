@@ -36,7 +36,7 @@ import Register from "./Page/Register";
 import LoginIcon from "@mui/icons-material/Login";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "./store";
-import { loginUser, logoutUser, registerUser } from "./action/authActions";
+import { getMe, loginUser, logoutUser, registerUser } from "./action/authActions";
 
 const drawerWidth = 240;
 
@@ -53,6 +53,7 @@ function App(props: Props) {
   const [isAccountCreated, setAccountCreated] = React.useState(true);
   const [selectedMenuItem, setSelectedMenuItem] = React.useState("");
   const matches = useMediaQuery("(max-width:600px)");
+  const me = useSelector((state: RootState) => state.auth);
 
   const user = useSelector((state: RootState) => state.auth.user);
 
@@ -61,10 +62,13 @@ function App(props: Props) {
     const token = localStorage.getItem("token");
     if (token || user?.status === "success") {
       setLoggedIn(true);
+     
     } else {
       setLoggedIn(false);
     }
   }, [user, dispatch]);
+
+
 
   const handleRegisterSubmit = (data: {
     firstName: string;
@@ -127,13 +131,16 @@ function App(props: Props) {
       setMobileOpen(!mobileOpen);
     }
   };
+  React.useEffect(() => {
+    dispatch(getMe());
+  }, [dispatch]);
   const drawer = (
     <div>
       {matches && (
         <Toolbar>
           <Avatar
             alt="Remy Sharp"
-            src="https://usrimg.quackquack.co/resize_159443301244458938835159.jpg"
+            src={me.user?.profileImage}
           />
 
           <img
@@ -262,23 +269,23 @@ function App(props: Props) {
           <Toolbar>
             <Avatar
               alt="Remy Sharp"
-              src="https://usrimg.quackquack.co/resize_159443301244458938835159.jpg"
+              src={me.user?.profileImage}
             />
 
             <img
-              height={30}
+              height={20}
               src="https://cdn.logojoy.com/wp-content/uploads/2018/05/01140918/958-768x591.png"
               alt="logo"
-              style={{ paddingLeft: "20px" }}
+              style={{ paddingLeft: "25px" }}
             />
             <Typography
               sx={{ fontWeight: "bold", marginLeft: "5px", color: "#f516e6" }}
             >
               {"Finder"}
             </Typography>
-            <IconButton style={{ marginLeft: "10px" }} aria-label="delete">
+            {/* <IconButton style={{ marginLeft: "10px" }} aria-label="delete">
               <SettingsIcon />
-            </IconButton>
+            </IconButton> */}
           </Toolbar>
 
           {drawer}

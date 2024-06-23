@@ -30,8 +30,9 @@ import DialogContent from "@mui/material/DialogContent";
 import ResponsiveMessageBox from "../components/MessageBox/MessageBox";
 import { loadFinderUsers } from "../action/usersAction";
 import { useDispatch } from "react-redux";
-import { AppDispatch, RootState } from "../store";
+import { AppDispatch, Message, RootState } from "../store";
 import { useSelector } from "react-redux";
+import socket from "../socket.ts/socket";
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -92,11 +93,12 @@ export default function MatchesCard() {
 
   const [open, setOpen] = React.useState(false);
   const [like, setLike] = React.useState(false);
-
+  const [selectedUser,setSelectedUser]  = React.useState(null);
   const handleLike = () => {
     setLike(!like);
   };
-  const handleClickOpenMessage = () => {
+  const handleClickOpenMessage = (user:any) => {
+    setSelectedUser(user)
     setOpenMessage(true);
   };
 
@@ -110,11 +112,14 @@ export default function MatchesCard() {
     setOpen(false);
   };
 
+  
+
+
   React.useEffect(() => {
 
 
     dispatch(loadFinderUsers()); // Fetch users from your backend
-
+    
     // const fetchData = async () => {
     //   try {
     //     const response = await fetch("https://randomuser.me/api/?results=8");
@@ -208,7 +213,7 @@ export default function MatchesCard() {
                       <IconButton
                        
                         aria-label="send message"
-                        onClick={handleClickOpenMessage}
+                        onClick={()=>handleClickOpenMessage(user)}
                       >
                         <MessageOutlinedIcon sx={{ color: "#4287f5" }} />
                       </IconButton>
@@ -447,9 +452,9 @@ export default function MatchesCard() {
       </Dialog>
       <ResponsiveMessageBox
         open={openMessage}
+        selectedUser={selectedUser}
         handleClose={() => setOpenMessage(false)}
       />
-  
     </>
   );
 }

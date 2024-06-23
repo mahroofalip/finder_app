@@ -26,8 +26,22 @@ export interface Message {
   status: any
 }
 
+export interface Chat {
+  // id: string;
+  room_id: string;
+  // receiverId: string;
+  // message_content: string;
+  // room_id: any;
+  // timestamp: string;
+  // status: any
+}
+
+
 export interface MessageState {
-  messages: Message[];
+  messages: any;
+  // messages:Message[]
+  // chat: Chat | null;
+    chat: any | null;
   loading: boolean;
   error: string | null;
 }

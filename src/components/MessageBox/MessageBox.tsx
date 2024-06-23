@@ -4,6 +4,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
+import { AppDispatch, Message, RootState } from "../../store";
 
 import {
   Avatar,
@@ -15,33 +16,62 @@ import {
   Typography,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import CloseIcon from '@mui/icons-material/Close';
+import CloseIcon from "@mui/icons-material/Close";
+import { getMe } from "../../action/authActions";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { createRoom } from "../../action/messageActions";
+import socket from "../../socket.ts/socket";
 
+export default function ResponsiveMessageBox(props: any) {
+  const { open, handleClose, selectedUser } = props;
 
-export default function ResponsiveMessageBox(props) {
-  const { open, handleClose } = props;
+  const dispatch: AppDispatch = useDispatch();
+  const me = useSelector((state: RootState) => state.auth);
+
   const [showError, setShowError] = React.useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
-  const [message, setMessage] = React.useState("Hi");
+  const [message, setMessage] = React.useState("");
   const [disable, setDisable] = React.useState(false);
+
   function submitMessage() {
+    dispatch(createRoom(me?.user?.id, selectedUser.id, message));
     setMessage("");
     setDisable(true);
-    setShowError(false)
+    setShowError(false);
   }
-  function resetStates(){
+  React.useEffect(() => {
+    // socket.emit("join-room", { room_id: "1" }); // Replace with actual room ID logic
+    socket.on("receive-message", (data:Message) => {
+      alert('ok')
+      console.log("Message received:", data);
+      // dispatch(receiveMessage(data));
+    });
+
+    return () => {
+      socket.off("receive-message");
+      socket.disconnect();
+    };
+  }, [dispatch]);
+  function resetStates() {
     setDisable(false);
-    setMessage('Hi')
+    setMessage("");
   }
-  
+
+  React.useEffect(() => {
+    if (open) {
+      dispatch(getMe());
+    }
+  }, [open, dispatch]);
+
   return (
     <Dialog
       fullScreen={fullScreen}
       open={open}
       aria-labelledby="responsive-dialog-title"
     >
-         <Box
+      <Box
         sx={{
           position: "absolute",
           top: 0,
@@ -49,9 +79,13 @@ export default function ResponsiveMessageBox(props) {
           zIndex: 1,
         }}
       >
-        <IconButton aria-label="close" onClick={()=>{
-            resetStates()
-            handleClose()}}>
+        <IconButton
+          aria-label="close"
+          onClick={() => {
+            resetStates();
+            handleClose();
+          }}
+        >
           <CloseIcon />
         </IconButton>
       </Box>
@@ -71,7 +105,7 @@ export default function ResponsiveMessageBox(props) {
         />
       </Box>
       <DialogTitle align="center" id="responsive-dialog-title">
-        {"Send Message to Mia"}
+        {`Send Message to ${me?.user?.firstName + " " + me?.user?.lastName}`}
       </DialogTitle>
       <DialogContent>
         {disable && (
@@ -91,14 +125,12 @@ export default function ResponsiveMessageBox(props) {
             id="standard-error-helper-text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            defaultValue="Hi there!"
             helperText={showError ? "Field Required" : " "}
             variant="standard"
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton
-
                     onClick={submitMessage}
                     aria-label="toggle password visibility"
                   >
@@ -110,13 +142,18 @@ export default function ResponsiveMessageBox(props) {
           />
         )}
         {disable && (
-          
-          <Button fullWidth  variant="contained" onClick={()=>{
-            resetStates()
-            handleClose()}}>Ok</Button>
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={() => {
+              resetStates();
+              handleClose();
+            }}
+          >
+            Ok
+          </Button>
         )}
       </DialogContent>
-    
     </Dialog>
   );
 }
