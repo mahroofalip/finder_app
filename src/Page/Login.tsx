@@ -1,6 +1,5 @@
 import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -53,11 +52,11 @@ const Login:React.FC<LoginProps> = ({ showRegisterPage,loginSubmit }) => {
       password: formData.get("password") as string,
     };
     // validateForm(data)
-    const errors = null;
+    // const errors = null;
 
     // setFormErrors(errors);
     // const hasErrors = Object.values(errors).some((error) => error !== "");
-    const hasErrors = false;
+    // const hasErrors = false;
     if (loginSubmit) {
       loginSubmit({
         email:data.email,

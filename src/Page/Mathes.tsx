@@ -30,9 +30,8 @@ import DialogContent from "@mui/material/DialogContent";
 import ResponsiveMessageBox from "../components/MessageBox/MessageBox";
 import { loadFinderUsers } from "../action/usersAction";
 import { useDispatch } from "react-redux";
-import { AppDispatch, Message, RootState } from "../store";
+import { AppDispatch, RootState } from "../store";
 import { useSelector } from "react-redux";
-import socket from "../socket.ts/socket";
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -83,8 +82,8 @@ export default function MatchesCard() {
 
   const dispatch: AppDispatch = useDispatch();
   const messagesList = useSelector((state: RootState) => state.users.users);
-  const loading = useSelector((state: RootState) => state.users.loading);
-  const error = useSelector((state: RootState) => state.users.error);
+  // const loading = useSelector((state: RootState) => state.users.loading);
+  // const error = useSelector((state: RootState) => state.users.error);
 
   const [expandedProfiles, setExpandedProfiles] =
     React.useState<ExpandedProfiles>([]);
@@ -116,25 +115,8 @@ export default function MatchesCard() {
 
 
   React.useEffect(() => {
-
-
-    dispatch(loadFinderUsers()); // Fetch users from your backend
-    
-    // const fetchData = async () => {
-    //   try {
-    //     const response = await fetch("https://randomuser.me/api/?results=8");
-    //     if (!response.ok) {
-    //       throw new Error("Network response was not ok");
-    //     }
-    //     const jsonData = await response.json();
-    //     setUsers(jsonData?.results);
-    //     setExpandedProfiles(new Array(jsonData?.results.length).fill(false));
-    //   } catch (error) {
-    //     console.error("Error fetching data:", error);
-    //   }
-    // };
-    // fetchData();
-  }, []);
+    dispatch(loadFinderUsers()); 
+  }, [dispatch]);
 
   const handleExpandClick = (index: number) => {
     const expandedProfilesCopy = [...expandedProfiles];

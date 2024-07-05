@@ -35,24 +35,24 @@ const GrayLabel = styled(Typography)({
   marginTop: 10,
 });
 
-const OfflineBadge = () => (
-  <span
-    style={{
-      width: 10,
-      height: 10,
-      borderRadius: "50%",
-      background: "gray",
-      display: "inline-block",
-      marginLeft: 5,
-    }}
-  />
-);
+// const OfflineBadge = () => (
+//   <span
+//     style={{
+//       width: 10,
+//       height: 10,
+//       borderRadius: "50%",
+//       background: "gray",
+//       display: "inline-block",
+//       marginLeft: 5,
+//     }}
+//   />
+// );
 
 export default function ChatPage(props: any) {
   const dispatch: AppDispatch = useDispatch();
-  const messagesList = useSelector((state: RootState) => state.message.messages);
-  const loading = useSelector((state: RootState) => state.message.loading);
-  const error = useSelector((state: RootState) => state.message.error);
+  // const messagesList = useSelector((state: RootState) => state.message.messages);
+  // const loading = useSelector((state: RootState) => state.message.loading);
+  // const error = useSelector((state: RootState) => state.message.error);
 
   const initialMessages: Message[] = [];
 

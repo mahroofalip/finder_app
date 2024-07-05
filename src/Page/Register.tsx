@@ -45,7 +45,7 @@ interface RegisterProps {
 const defaultTheme = createTheme();
 const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
   const  {user,loading}= useSelector((state: RootState) => state.auth);
-  const  state = useSelector((state: RootState) => state);
+  // const  state = useSelector((state: RootState) => state);
 
   const [formErrors, setFormErrors] = React.useState({
     firstName: "",
@@ -68,11 +68,11 @@ const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
     return re.test(String(email).toLowerCase());
   };
 
-  const validatePassword = (password: string) => {
-    const re =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    return re.test(password);
-  };
+  // const validatePassword = (password: string) => {
+  //   const re =
+  //     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  //   return re.test(password);
+  // };
 
   const validateForm = (data: any) => {
     let errors = { ...formErrors };
@@ -104,9 +104,7 @@ const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
     if (!data.password) {
       errors.password = "Password is required";
 
-      // else if (!validatePassword(data.password)) {
-      //   errors.password =
-      //     "Password must contain at least 8 characters, including uppercase, lowercase, number, and special character";
+    
     } else {
       errors.password = "";
     }
@@ -191,7 +189,6 @@ const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
             Sign up
           </Typography>
 
-            {/* {JSON.stringify(state)} */}
 
             {user?.status === "exist" ?  <small className="red-text"> {user?.message} </small>: "" }
 
