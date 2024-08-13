@@ -34,35 +34,36 @@ const userSlice = createSlice({
 
 
 export const {
-   
     updateUserInfoFailure,
     updateUserInfoStart,
     updateUserInfoSuccess
 } = userSlice.actions;
 
 
-
-
-
-
 export const updateUserProfile =
-  (userData: User) => async (dispatch: AppDispatch) => {
+  (profile: any) => async (dispatch: AppDispatch) => {
     dispatch(updateUserInfoStart());
+    const token = localStorage.getItem("token"); 
+
     try {
       const response = await axios.put(
-        "http://localhost:5000/api/user/update-user",
-        userData,
+        "http://localhost:5000/api/users/update-user",
+        profile,
         {
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, 
           },
         }
       );
 
       dispatch(updateUserInfoSuccess(response.data));
+      alert('Succcessfully updated')
     } catch (error: any) {
         dispatch(updateUserInfoFailure(error.response.data));
     }
   };
+
+
 
 export default userSlice.reducer;

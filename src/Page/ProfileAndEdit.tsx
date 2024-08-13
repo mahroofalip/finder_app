@@ -11,6 +11,8 @@ import { loadhairColorOptions } from '../action/hairColorAction';
 import GooglePlacesAutocomplete from '../components/AutoComplete/GoogleLocation';
 import { TextareaAutosize as BaseTextareaAutosize } from '@mui/base/TextareaAutosize';
 import { styled } from '@mui/system';
+import { updateUserProfile } from '../action/profileAction';
+import { getMe } from '../action/authActions';
 
 const blue = {
   100: '#DAECFF',
@@ -70,7 +72,7 @@ interface Profile {
   lastName: string;
   email: string;
   phone: string;
-  avatarUrl: string;
+  profileImage: string;
   dob: string;
   height: string;
   weight: string;
@@ -81,21 +83,31 @@ interface Profile {
   profession: string;
   displayName: string;
   description: string;
-  place: PlaceType | null;
+  place: string
+  // place: PlaceType | null;
 }
 
-interface PlaceType {
-  description: string;
-  place_id: string;
-}
+// interface PlaceType {
+//   description: string| null;
+//   place_id: string| null;
+// }
 
 const ProfileForm: React.FC = () => {
+
+  const [errors, setErrors] = useState<Partial<Record<keyof Profile, string>>>({});
+  const { user } = useSelector((state: RootState) => state.auth);
+  const { genderOptions } = useSelector((state: RootState) => state.genderOption);
+  const { educationOptions } = useSelector((state: RootState) => state.educationOption);
+  const { professionOptions } = useSelector((state: RootState) => state.professionOption);
+  const { eyeColorOptions } = useSelector((state: RootState) => state.eyeColorOption);
+  const { hairColorOptions } = useSelector((state: RootState) => state.hairColorOption);
+
   const [profile, setProfile] = useState<Profile>({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
-    avatarUrl: '',
+    profileImage: '',
     dob: '',
     height: '',
     weight: '',
@@ -106,16 +118,34 @@ const ProfileForm: React.FC = () => {
     profession: '',
     displayName: '',
     description: '',
-    place: null,
+    place: '',
   });
+  useEffect(() => {
+    if (user) {
+      setProfile({
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        profileImage: user.profileImage || '',
+        dob: user.birthDate || '',
+        height: user.height || '',
+        weight: user.weight || '',
+        eyeColor: user.eyeColor || '',
+        hairColor: user.hairColor || '',
+        education: user.education || '',
+        gender: user.gender || '',
+        profession: user.profession || '',
+        displayName: user.displayName || '',
+        description: user.description || '',
+        place: user.place || '',
+        // place:{ 
+        //   description:user.place,
+        //   place_id: null },
 
-  const [errors, setErrors] = useState<Partial<Record<keyof Profile, string>>>({});
-
-  const { genderOptions } = useSelector((state: RootState) => state.genderOption);
-  const { educationOptions } = useSelector((state: RootState) => state.educationOption);
-  const { professionOptions } = useSelector((state: RootState) => state.professionOption);
-  const { eyeColorOptions } = useSelector((state: RootState) => state.eyeColorOption);
-  const { hairColorOptions } = useSelector((state: RootState) => state.hairColorOption);
+      });
+    }
+  }, [user]);
 
 
 
@@ -127,11 +157,12 @@ const ProfileForm: React.FC = () => {
     dispatch(loadProfessionOptions());
     dispatch(loadEyeColorOptions());
     dispatch(loadhairColorOptions());
-    console.log(genderOptions, "genderOptions");
-    console.log(educationOptions, "educationOptions");
-    console.log(professionOptions, "professionOptions");
-    console.log(eyeColorOptions, "eyeColorOptions");
-    console.log(hairColorOptions, "hairColorOptions");
+    dispatch(getMe());
+    // console.log(genderOptions, "genderOptions");
+    // console.log(educationOptions, "educationOptions");
+    // console.log(professionOptions, "professionOptions");
+    // console.log(eyeColorOptions, "eyeColorOptions");
+    // console.log(hairColorOptions, "hairColorOptions");
   }, [dispatch]);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -146,8 +177,8 @@ const ProfileForm: React.FC = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        setProfile((prevProfile) => ({ ...prevProfile, avatarUrl: reader.result as string }));
-        setErrors((prevErrors) => ({ ...prevErrors, avatarUrl: '' })); // Clear the avatar error
+        setProfile((prevProfile) => ({ ...prevProfile, profileImage: reader.result as string }));
+        setErrors((prevErrors) => ({ ...prevErrors, profileImage: '' })); // Clear the avatar error
         validate()
       };
 
@@ -169,7 +200,7 @@ const ProfileForm: React.FC = () => {
     validate()
   };
 
-  const handlePlaceSelect = (place: PlaceType | null) => {
+  const handlePlaceSelect = (place: any | null) => {
     setProfile((prevProfile) => ({ ...prevProfile, place }));
     setErrors((prevErrors) => ({ ...prevErrors, place: '' })); // Clear the place error
     validate()
@@ -188,10 +219,10 @@ const ProfileForm: React.FC = () => {
       tempErrors.lastName = 'Last Name is required and should contain only alphabets.';
     }
 
-    if (!profile.avatarUrl) {
-      tempErrors.avatarUrl = 'Profile is required.';
+    if (!profile.profileImage) {
+      tempErrors.profileImage = 'Profile is required.';
     } else {
-      tempErrors.avatarUrl = ''
+      tempErrors.profileImage = ''
     }
 
     if (!profile.dob) {
@@ -251,6 +282,7 @@ const ProfileForm: React.FC = () => {
     console.log(validate(), "tempErrors validate()");
 
     if (validate()) {
+      dispatch(updateUserProfile(profile));
       console.log('tempErrors Profile submitted:', profile);
     }
   };
@@ -264,7 +296,7 @@ const ProfileForm: React.FC = () => {
               <Avatar
                 sx={{ width: 150, height: 150, cursor: 'pointer' }}
                 alt="Profile Avatar"
-                src={profile.avatarUrl}
+                src={profile.profileImage}
                 onClick={handleAvatarClick}
               />
               <IconButton
@@ -288,43 +320,65 @@ const ProfileForm: React.FC = () => {
                 accept="image/*"
                 onChange={handleAvatarChange}
               />
-              {errors.avatarUrl && (
+              {errors.profileImage && (
                 <Typography color="error" variant="body2">
-                  {errors.avatarUrl}
+                  {errors.profileImage}
                 </Typography>
               )}
             </div>
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <label>Username (non-editable)</label>
+            <label>Username</label>
             <TextField
               placeholder="Username"
               name="username"
               size="small"
               id="username"
-              value={profile.firstName}
-              onChange={handleChange}
+              value={user?.userName || ''}
               InputProps={{
                 readOnly: true,
+                sx: {
+                  backgroundColor: 'rgba(0, 0, 0, 0.1)', 
+                  '& .MuiInputBase-input': {
+                    color: 'rgba(0, 0, 0, 0.5)', 
+                  },
+                },
+              }}
+              InputLabelProps={{
+                sx: {
+                  color: 'rgba(0, 0, 0, 0.5)', // Label color
+                },
               }}
               fullWidth
+              disabled 
             />
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <label>Email (non-editable)</label>
+            <label>Email</label>
             <TextField
               placeholder="Email"
               name="email"
               size="small"
               id="email"
-              value={profile.lastName}
-              onChange={handleChange}
+              value={user?.email || ''}
               InputProps={{
                 readOnly: true,
+                sx: {
+                  backgroundColor: 'rgba(0, 0, 0, 0.1)', 
+                  '& .MuiInputBase-input': {
+                    color: 'rgba(0, 0, 0, 0.5)', 
+                  },
+                },
+              }}
+              InputLabelProps={{
+                sx: {
+                  color: 'rgba(0, 0, 0, 0.5)', // Label color
+                },
               }}
               fullWidth
+              disabled 
             />
           </Grid>
 
@@ -539,7 +593,8 @@ const ProfileForm: React.FC = () => {
           </Grid>
           <Grid item xs={12} md={6}>
             <label>Place</label>
-            <GooglePlacesAutocomplete onSelect={handlePlaceSelect} />
+            <GooglePlacesAutocomplete initialValue={profile.place}
+              onSelect={handlePlaceSelect} />
             {errors.place && (
               <Typography color="error" variant="body2">
                 {errors.place}

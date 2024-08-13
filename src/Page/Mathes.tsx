@@ -176,7 +176,7 @@ export default function MatchesCard() {
                     <CardMedia
                       component="img"
                       height="250"
-                      image={user?.profileImage}
+                      image={user?.profileImage || ""}
                       alt="Paella dish"
                     />
                     <CardContent sx={{ margin: 0 }}>

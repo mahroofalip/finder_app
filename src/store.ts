@@ -92,25 +92,30 @@ export interface ProfessionOption {
 
 
 export interface User {
-  password: string;
-  phone: string;
-  email: string;
+  password: string| null;
+  phone: string| null;
+  email: string| null;
   message: string | null;
   status: string | null;
   firstName:string | null;
   lastName:string | null;
+  education :string | null;
+  profession :string | null;
+  displayName :string | null;
+  description :string | null;
+  place :string | null;
   age:string | null;
-  isOnline:boolean;
-  profileImage:string
-  city:string
-  id:any
-  gender:string
-  userName:string
-  birthDate:string;
-  height:string
-  weight:string
-  eyeColor:string
-  hairColor:string
+  isOnline:boolean| null;
+  profileImage: string| null;
+  city:string| null;
+  id:any| null;
+  gender:string| null;
+  userName:string| null;
+  birthDate:string| null;
+  height:string| null;
+  weight:string| null;
+  eyeColor:string| null;
+  hairColor:string| null;
 }
 
 export interface AuthState {

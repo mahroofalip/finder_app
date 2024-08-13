@@ -12,11 +12,12 @@ interface PlaceType {
 
 interface GooglePlacesAutocompleteProps {
     onSelect: (selectedPlace: PlaceType | null) => void;
+    initialValue?: PlaceType | string;
 }
 
-const GooglePlacesAutocomplete: React.FC<GooglePlacesAutocompleteProps> = ({ onSelect }) => {
+const GooglePlacesAutocomplete: React.FC<GooglePlacesAutocompleteProps> = ({ onSelect, initialValue }) => {
     const [options, setOptions] = useState<PlaceType[]>([]);
-    const [inputValue, setInputValue] = useState('');
+    const [inputValue, setInputValue] = useState<string | PlaceType>(initialValue || '');
     const [error, setError] = useState<string | null>(null);
     const { places, loading } = useSelector((state: RootState) => state.googlePlaces);
     const dispatch: AppDispatch = useDispatch();
@@ -44,6 +45,15 @@ const GooglePlacesAutocomplete: React.FC<GooglePlacesAutocompleteProps> = ({ onS
         [dispatch]
     );
 
+    useEffect(() => {
+        if (initialValue && typeof initialValue !== 'string') {
+            setOptions([initialValue]);
+            setInputValue(initialValue);
+        } else if (typeof initialValue === 'string') {
+            setInputValue(initialValue);
+        }
+    }, [initialValue]);
+
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
         setInputValue(value);
@@ -62,27 +72,29 @@ const GooglePlacesAutocomplete: React.FC<GooglePlacesAutocompleteProps> = ({ onS
         value: string | PlaceType | null,
         reason: any
     ) => {
-   
         if (typeof value === 'string') {
             onSelect(null); // Handle the case where the input is a free text
         } else {
             onSelect(value); // Pass the selected place to the parent component
+            setInputValue(value || '');
         }
     };
 
     return (
         <div>
             <Autocomplete
+                key={typeof initialValue === 'string' ? initialValue : initialValue?.place_id || 'default_key'}
                 freeSolo
                 options={options as (PlaceType | string)[]}
                 getOptionLabel={getOptionLabel}
                 onChange={handleChange} // Handle selection change
+                inputValue={typeof inputValue === 'string' ? inputValue : inputValue.description} // Set the value of the input
                 renderInput={(params) => (
                     <TextField
                         {...params}
                         variant="outlined"
                         onChange={handleInputChange}
-                        value={inputValue}
+                        value={typeof inputValue === 'string' ? inputValue : inputValue.description}
                         size='small'
                         placeholder='Location'
                         error={Boolean(error)}

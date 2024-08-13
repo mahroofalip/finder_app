@@ -55,8 +55,8 @@ function App(props: Props) {
   const [isAccountCreated, setAccountCreated] = React.useState(true);
   const [selectedMenuItem, setSelectedMenuItem] = React.useState("");
   const matches = useMediaQuery("(max-width:600px)");
-  const me = useSelector((state: RootState) => state.auth);
 
+  const me = useSelector((state: RootState) => state.auth);
   const user = useSelector((state: RootState) => state.auth.user);
 
 
@@ -139,8 +139,7 @@ function App(props: Props) {
     <div className="hide-scrollbar" style={{ overflowY: "auto", height: "100%" }}>
       {matches && (
         <Toolbar>
-          <Avatar alt="Remy Sharp" src={me.user?.profileImage} />
-
+          <Avatar alt="Remy Sharp" src={me.user?.profileImage || ""}  />
           <img
             height={30}
             src="https://cdn.logojoy.com/wp-content/uploads/2018/05/01140918/958-768x591.png"
@@ -264,8 +263,7 @@ function App(props: Props) {
           <Toolbar>
             <Avatar
               alt="Remy Sharp"
-              src={me.user?.profileImage}
-            />
+              src={me.user?.profileImage || ""}             />
 
             <img
               height={20}
