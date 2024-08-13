@@ -75,7 +75,7 @@ export default function ChatPage(props: any) {
 
   useEffect(() => {
     // socket.emit("join-room", { room_id: "1" }); // Replace with actual room ID logic
-    socket.on("receive-message", (data:Message) => {
+    socket.on("receive-message", (data: Message) => {
       alert('ok')
       console.log("Message received:", data);
       dispatch(receiveMessage(data));
@@ -140,14 +140,17 @@ export default function ChatPage(props: any) {
           sx={{ backgroundColor: "#f2f7f4" }}
           avatar={
             <>
-              <ArrowBackIcon />
+              <IconButton onClick={props.backToMessageList} aria-label="back">
+                <ArrowBackIcon />
+              </IconButton>
+
               <Badge
                 overlap="circular"
                 anchorOrigin={{
                   vertical: "bottom",
                   horizontal: "right",
                 }}
-                sx={{ marginLeft: 5 }}
+                sx={{ marginLeft: 3 }}
               >
                 <Avatar
                   aria-label="recipe"

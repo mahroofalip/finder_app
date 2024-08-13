@@ -51,11 +51,13 @@ const Messages: React.FC = () => {
   const handleUserClick = (user: User) => {
     setSelectedUser(user);
   };
-
+  const nullfyUserSelect = () => {
+    setSelectedUser(null) 
+   };
   return (
     <>
       {selectedUser ? (
-        <ChatPage user={selectedUser} onClose={() => setSelectedUser(null)} />
+        <ChatPage backToMessageList={nullfyUserSelect} user={selectedUser} onClose={() => setSelectedUser(null)} />
       ) : (
         <List sx={{ width: "100%", bgcolor: "background.paper" }}>
           {chatRooms.map((chat: any, index: any) => (

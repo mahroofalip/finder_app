@@ -5,7 +5,6 @@ import DialogTitle from "@mui/material/DialogTitle";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import { AppDispatch, Message, RootState } from "../../store";
-
 import {
   Avatar,
   Box,
@@ -25,16 +24,13 @@ import socket from "../../socket.ts/socket";
 
 export default function ResponsiveMessageBox(props: any) {
   const { open, handleClose, selectedUser } = props;
-
   const dispatch: AppDispatch = useDispatch();
   const me = useSelector((state: RootState) => state.auth);
-
   const [showError, setShowError] = React.useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
   const [message, setMessage] = React.useState("");
   const [disable, setDisable] = React.useState(false);
-
   function submitMessage() {
     dispatch(createRoom(me?.user?.id, selectedUser.id, message));
     setMessage("");

@@ -24,6 +24,7 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import SignLanguageIcon from "@mui/icons-material/SignLanguage";
 import MessageIcon from "@mui/icons-material/Message";
 import { Avatar } from "@mui/material";
+import PersonIcon from '@mui/icons-material/Person';
 import MatchesCard from "./Page/Mathes";
 import SearchingCriteria from "./Page/SearchingCriteria";
 import Visitors from "./Page/Visitors";
@@ -37,6 +38,7 @@ import LoginIcon from "@mui/icons-material/Login";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "./store";
 import { getMe, loginUser, logoutUser, registerUser } from "./action/authActions";
+import ProfileForm from "./Page/ProfileAndEdit";
 
 const drawerWidth = 240;
 
@@ -62,7 +64,7 @@ function App(props: Props) {
     const token = localStorage.getItem("token");
     if (token || user?.status === "success") {
       setLoggedIn(true);
-     
+
     } else {
       setLoggedIn(false);
     }
@@ -95,7 +97,6 @@ function App(props: Props) {
       email,
     };
 
-    console.log(userData, "userData kkkkkkkkkkkkkkkkkkkkkk start");
 
     dispatch(loginUser(userData));
   };
@@ -135,13 +136,10 @@ function App(props: Props) {
     dispatch(getMe());
   }, [dispatch]);
   const drawer = (
-    <div>
+    <div className="hide-scrollbar" style={{ overflowY: "auto", height: "100%" }}>
       {matches && (
         <Toolbar>
-          <Avatar
-            alt="Remy Sharp"
-            src={me.user?.profileImage}
-          />
+          <Avatar alt="Remy Sharp" src={me.user?.profileImage} />
 
           <img
             height={30}
@@ -161,8 +159,10 @@ function App(props: Props) {
       )}
 
       <Divider />
-      <List>
+          
+      <List className="bg-Body">
         {[
+          "Profile",
           "Matches",
           "Search",
           "Visitors",
@@ -175,22 +175,15 @@ function App(props: Props) {
           <ListItem key={text} onClick={() => handleMenuItemClick(text)}>
             <ListItemButton>
               <ListItemIcon>
-                {index === 0 && <SignLanguageIcon sx={{ color: "skyblue" }} />}
-                {index === 1 && <SearchOutlinedIcon sx={{ color: "black" }} />}
-                {index === 2 && (
-                  <RemoveRedEyeIcon sx={{ color: "greenyellow" }} />
-                )}
-                {index === 3 && <FavoriteBorderIcon sx={{ color: "red" }} />}
-
-                {index === 4 && <MessageIcon sx={{ color: "blue" }} />}
-
-                {index === 5 && (
-                  <ThumbDownOffAltIcon sx={{ color: "rosybrown" }} />
-                )}
-
-                {index === 6 && <BlockOutlinedIcon sx={{ color: "orange" }} />}
-
-                {index === 7 && <LoginIcon sx={{ color: "black" }} />}
+                {index === 0 && <PersonIcon sx={{ color: "green" }} />}
+                {index === 1 && <SignLanguageIcon sx={{ color: "skyblue" }} />}
+                {index === 2 && <SearchOutlinedIcon sx={{ color: "black" }} />}
+                {index === 3 && <RemoveRedEyeIcon sx={{ color: "greenyellow" }} />}
+                {index === 4 && <FavoriteBorderIcon sx={{ color: "red" }} />}
+                {index === 5 && <MessageIcon sx={{ color: "blue" }} />}
+                {index === 6 && <ThumbDownOffAltIcon sx={{ color: "rosybrown" }} />}
+                {index === 7 && <BlockOutlinedIcon sx={{ color: "orange" }} />}
+                {index === 8 && <LoginIcon sx={{ color: "black" }} />}
               </ListItemIcon>
               <ListItemText primary={text} />
             </ListItemButton>
@@ -205,7 +198,7 @@ function App(props: Props) {
     window !== undefined ? () => window().document.body : undefined;
 
   return isLoggedIn ? (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex" , }}>
       <CssBaseline />
       <AppBar
         position="fixed"
@@ -233,7 +226,7 @@ function App(props: Props) {
       </AppBar>
       <Box
         component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 }  }}
         aria-label="mailbox folders"
       >
         <Drawer
@@ -262,8 +255,10 @@ function App(props: Props) {
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,
+              
             },
           }}
+          
           open
         >
           <Toolbar>
@@ -283,9 +278,9 @@ function App(props: Props) {
             >
               {"Finder"}
             </Typography>
-            {/* <IconButton style={{ marginLeft: "10px" }} aria-label="delete">
+            <IconButton style={{ marginLeft: "10px" }} aria-label="delete">
               <SettingsIcon />
-            </IconButton> */}
+            </IconButton>
           </Toolbar>
 
           {drawer}
@@ -300,6 +295,12 @@ function App(props: Props) {
         }}
       >
         <Toolbar />
+        {selectedMenuItem === "Profile" && (
+          <>
+            <ProfileForm />
+          </>
+        )}
+        
         {selectedMenuItem === "Matches" && (
           <>
             <MatchesCard />

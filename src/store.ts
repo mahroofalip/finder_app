@@ -2,6 +2,15 @@ import { configureStore } from '@reduxjs/toolkit';
 import messageReducer from './action/messageActions';
 import authActions from './action/authActions';
 import usersAction from './action/usersAction';
+import genderOptionsAction from './action/genderOptionsAction';
+import educationOptionsAction from './action/educationOptionsAction';
+import professionOptionsAction from './action/professionOptionsAction';
+import eyeColorOptionsAction from './action/eyeColorAction';
+import hairColorOptionsAction from './action/hairColorAction';
+import googleMapPlaceAction from './action/googleMapPlaceAction';
+import updateUserProfile  from './action/profileAction';
+
+
 
 
 
@@ -9,7 +18,14 @@ export const store = configureStore({
   reducer: {
     auth: authActions,
     message: messageReducer,
-    users:usersAction
+    users:usersAction,
+    genderOption:genderOptionsAction,
+    educationOption:educationOptionsAction,
+    professionOption:professionOptionsAction,
+    eyeColorOption:eyeColorOptionsAction,
+    hairColorOption:hairColorOptionsAction,
+    googlePlaces:googleMapPlaceAction,
+    updateUser:updateUserProfile
   },
 });
 
@@ -47,6 +63,34 @@ export interface MessageState {
 }
 
 // Define User and UserState types
+
+export interface PlacesOption {
+  id: string;
+  description: string;
+}
+export interface GenderOption {
+  id: string;
+  gender: string;
+}
+export interface EyeColorOption {
+  id: string;
+  eyeColor: string;
+}
+export interface hairColorOption {
+  id: string;
+  hairColor: string;
+}
+
+export interface EducationOption {
+  id: string;
+  education: string;
+}
+export interface ProfessionOption {
+  id: string;
+  profession: string;
+}
+
+
 export interface User {
   password: string;
   phone: string;
@@ -77,6 +121,47 @@ export interface AuthState {
 
 export interface UserState {
   users: User[];
+  user:User| null;
   loading: boolean;
   error: string | null;
 }
+
+export interface genderOptionsState {
+  genderOptions: GenderOption[];
+  loading: boolean;
+  error: string | null;
+}
+export interface googlemapPlaceOptionsState {
+  places: PlacesOption[];
+  loading: boolean;
+  error: string | null;
+}
+
+
+export interface educationOptionsState {
+  educationOptions: EducationOption[];
+  loading: boolean;
+  error: string | null;
+}
+
+
+export interface professionOptionsState {
+  professionOptions: ProfessionOption[];
+  loading: boolean;
+  error: string | null;
+}
+
+export interface eyeColorOptionsState {
+  eyeColorOptions: EyeColorOption[];
+  loading: boolean;
+  error: string | null;
+}
+
+
+export interface hairColorOptionsState {
+  hairColorOptions: hairColorOption[];
+  loading: boolean;
+  error: string | null;
+}
+
+
