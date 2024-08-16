@@ -13,6 +13,10 @@ import { TextareaAutosize as BaseTextareaAutosize } from '@mui/base/TextareaAuto
 import { styled } from '@mui/system';
 import { updateUserProfile } from '../action/profileAction';
 import { getMe } from '../action/authActions';
+import CheckIcon from '@mui/icons-material/Check';
+import ErrorIcon from '@mui/icons-material/Error'; // Import error icon
+import AlertComponent from '../components/Alerts/AlertComponent';
+
 
 const blue = {
   100: '#DAECFF',
@@ -73,6 +77,7 @@ interface Profile {
   email: string;
   phone: string;
   profileImage: string;
+  profileExt: string;
   dob: string;
   height: string;
   weight: string;
@@ -84,6 +89,7 @@ interface Profile {
   displayName: string;
   description: string;
   place: string
+  profileImageKey: string
   // place: PlaceType | null;
 }
 
@@ -93,14 +99,18 @@ interface Profile {
 // }
 
 const ProfileForm: React.FC = () => {
-
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alertSeverity, setAlertSeverity] = useState<'success' | 'error'>('success');
+  const [alertIcon, setAlertIcon] = useState<React.ReactNode>(<CheckIcon fontSize="inherit" />);
   const [errors, setErrors] = useState<Partial<Record<keyof Profile, string>>>({});
-  const { user } = useSelector((state: RootState) => state.auth);
   const { genderOptions } = useSelector((state: RootState) => state.genderOption);
   const { educationOptions } = useSelector((state: RootState) => state.educationOption);
   const { professionOptions } = useSelector((state: RootState) => state.professionOption);
   const { eyeColorOptions } = useSelector((state: RootState) => state.eyeColorOption);
   const { hairColorOptions } = useSelector((state: RootState) => state.hairColorOption);
+  const { user: authUser } = useSelector((state: RootState) => state.auth);
+const { error:updateUserErr, user: updateUser, loading:updateUserLoading } = useSelector((state: RootState) => state.updateUser);
+
 
   const [profile, setProfile] = useState<Profile>({
     firstName: '',
@@ -119,33 +129,36 @@ const ProfileForm: React.FC = () => {
     displayName: '',
     description: '',
     place: '',
+    profileExt:'',
+    profileImageKey:''
   });
   useEffect(() => {
-    if (user) {
+    if (authUser) {
+     
       setProfile({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        profileImage: user.profileImage || '',
-        dob: user.birthDate || '',
-        height: user.height || '',
-        weight: user.weight || '',
-        eyeColor: user.eyeColor || '',
-        hairColor: user.hairColor || '',
-        education: user.education || '',
-        gender: user.gender || '',
-        profession: user.profession || '',
-        displayName: user.displayName || '',
-        description: user.description || '',
-        place: user.place || '',
-        // place:{ 
-        //   description:user.place,
-        //   place_id: null },
+        firstName: authUser.firstName || '',
+        lastName: authUser.lastName || '',
+        email: authUser.email || '',
+        phone: authUser.phone || '',
+        profileImage: authUser.profileImage || '',
+        dob: authUser.birthDate || '',
+        height: authUser.height || '',
+        weight: authUser.weight || '',
+        eyeColor: authUser.eyeColor || '',
+        hairColor: authUser.hairColor || '',
+        education: authUser.education || '',
+        gender: authUser.gender || '',
+        profession: authUser.profession || '',
+        displayName: authUser.displayName || '',
+        description: authUser.description || '',
+        place: authUser.place || '',
+        profileExt:'',
+        profileImageKey:authUser.profileImageKey || ""
+        
 
       });
     }
-  }, [user]);
+  }, [authUser]);
 
 
 
@@ -158,11 +171,6 @@ const ProfileForm: React.FC = () => {
     dispatch(loadEyeColorOptions());
     dispatch(loadhairColorOptions());
     dispatch(getMe());
-    // console.log(genderOptions, "genderOptions");
-    // console.log(educationOptions, "educationOptions");
-    // console.log(professionOptions, "professionOptions");
-    // console.log(eyeColorOptions, "eyeColorOptions");
-    // console.log(hairColorOptions, "hairColorOptions");
   }, [dispatch]);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -173,18 +181,23 @@ const ProfileForm: React.FC = () => {
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        setProfile((prevProfile) => ({ ...prevProfile, profileImage: reader.result as string }));
+        const fileExtension = file.name.split('.').pop(); // Extract file extension
+        setProfile((prevProfile) => ({ 
+          ...prevProfile, 
+          profileImage: reader.result as string,
+          profileExt: fileExtension || '' // Add file extension to the state
+        }));
         setErrors((prevErrors) => ({ ...prevErrors, profileImage: '' })); // Clear the avatar error
-        validate()
+        validate();
       };
-
+  
       reader.readAsDataURL(file);
     }
   };
+  
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;
@@ -277,18 +290,37 @@ const ProfileForm: React.FC = () => {
     return Object.keys(tempErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(validate(), "tempErrors validate()");
 
     if (validate()) {
-      dispatch(updateUserProfile(profile));
-      console.log('tempErrors Profile submitted:', profile);
+      try {
+        await dispatch(updateUserProfile(profile));
+        // Show success alert
+        setAlertMessage('Your profile has been updated successfully!');
+        setAlertSeverity('success');
+        dispatch(getMe());
+        setAlertIcon(<CheckIcon fontSize="inherit" />);
+      } catch (error) {
+        // Show error alert
+        setAlertMessage('There was an error updating your profile.');
+        setAlertSeverity('error');
+        setAlertIcon(<ErrorIcon fontSize="inherit" />);
+      }
     }
   };
 
+  useEffect(() => {
+   
+    const timer = setTimeout(() => {
+      setAlertMessage(null);
+    }, 5000); 
+    return () => clearTimeout(timer);
+  }, [alertMessage]);
+
   return (
     <Paper elevation={3} style={{ padding: '16px' }}>
+
       <form onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12} md={12}>
@@ -335,13 +367,13 @@ const ProfileForm: React.FC = () => {
               name="username"
               size="small"
               id="username"
-              value={user?.userName || ''}
+              value={authUser?.userName || ''}
               InputProps={{
                 readOnly: true,
                 sx: {
-                  backgroundColor: 'rgba(0, 0, 0, 0.1)', 
+                  backgroundColor: 'rgba(0, 0, 0, 0.1)',
                   '& .MuiInputBase-input': {
-                    color: 'rgba(0, 0, 0, 0.5)', 
+                    color: 'rgba(0, 0, 0, 0.5)',
                   },
                 },
               }}
@@ -351,7 +383,7 @@ const ProfileForm: React.FC = () => {
                 },
               }}
               fullWidth
-              disabled 
+              disabled
             />
           </Grid>
 
@@ -362,13 +394,13 @@ const ProfileForm: React.FC = () => {
               name="email"
               size="small"
               id="email"
-              value={user?.email || ''}
+              value={authUser?.email || ''}
               InputProps={{
                 readOnly: true,
                 sx: {
-                  backgroundColor: 'rgba(0, 0, 0, 0.1)', 
+                  backgroundColor: 'rgba(0, 0, 0, 0.1)',
                   '& .MuiInputBase-input': {
-                    color: 'rgba(0, 0, 0, 0.5)', 
+                    color: 'rgba(0, 0, 0, 0.5)',
                   },
                 },
               }}
@@ -378,7 +410,7 @@ const ProfileForm: React.FC = () => {
                 },
               }}
               fullWidth
-              disabled 
+              disabled
             />
           </Grid>
 
@@ -618,11 +650,16 @@ const ProfileForm: React.FC = () => {
               </Typography>
             )}
           </Grid>
-
-
-
           <Grid item xs={12}>
-            <Button type="submit" fullWidth variant="contained" color="primary">
+            {alertMessage && (
+              <AlertComponent 
+                message={alertMessage}
+                severity={alertSeverity}
+                icon={alertIcon}
+              />
+            )}
+           
+            <Button sx={{mt:2}} type="submit" fullWidth variant="contained" color="primary">
               Submit
             </Button>
           </Grid>

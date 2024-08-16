@@ -40,7 +40,7 @@ export default function ResponsiveMessageBox(props: any) {
   React.useEffect(() => {
     // socket.emit("join-room", { room_id: "1" }); // Replace with actual room ID logic
     socket.on("receive-message", (data:Message) => {
-      alert('ok')
+      
       console.log("Message received:", data);
       // dispatch(receiveMessage(data));
     });

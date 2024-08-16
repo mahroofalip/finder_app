@@ -58,7 +58,7 @@ export const updateUserProfile =
       );
 
       dispatch(updateUserInfoSuccess(response.data));
-      alert('Succcessfully updated')
+      
     } catch (error: any) {
         dispatch(updateUserInfoFailure(error.response.data));
     }

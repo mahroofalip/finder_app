@@ -39,6 +39,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "./store";
 import { getMe, loginUser, logoutUser, registerUser } from "./action/authActions";
 import ProfileForm from "./Page/ProfileAndEdit";
+import useUserActivity from "./components/useUserActivity/useUserActivity";
+import socket from "./socket.ts/socket";
+import { intewellToFetch } from "./consts";
 
 const drawerWidth = 240;
 
@@ -47,6 +50,9 @@ interface Props {
 }
 
 function App(props: Props) {
+
+  // useUserActivity();
+
   const dispatch: AppDispatch = useDispatch();
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -59,9 +65,25 @@ function App(props: Props) {
   const me = useSelector((state: RootState) => state.auth);
   const user = useSelector((state: RootState) => state.auth.user);
 
+  
+  React.useEffect(() => {
+    socket.emit('online', user);
+    const intervalId = setInterval(() => {
+      console.log(user, "useruseruseruser");
+      socket.emit('online', user);
+    },intewellToFetch);
+  
+    if (!user) {
+      clearInterval(intervalId)
+      return
+    }
+    return () => clearInterval(intervalId);
+  }, [user, intewellToFetch]);
+  
 
   React.useEffect(() => {
     const token = localStorage.getItem("token");
+   
     if (token || user?.status === "success") {
       setLoggedIn(true);
 
@@ -108,16 +130,25 @@ function App(props: Props) {
   const displayLogin = () => {
     setAccountCreated(true);
   };
-
+  React.useEffect(() => {
+  
+    return () => {
+       socket.emit('offline', me.user);
+    };
+  }, []);
   const handleMenuItemClick = (text: string) => {
     if (text === "Logout") {
-      setLoggedIn(false);
-      dispatch(logoutUser());
-      setSelectedMenuItem("");
+      logoutFn()
     } else {
       setSelectedMenuItem(text);
     }
   };
+  const logoutFn = ()=>{
+    setLoggedIn(false);
+      socket.emit('offline', me.user);
+      dispatch(logoutUser());
+      setSelectedMenuItem("");
+  }
   const handleDrawerClose = () => {
     setIsClosing(true);
     setMobileOpen(false);
@@ -222,7 +253,9 @@ function App(props: Props) {
             {selectedMenuItem}
           </Typography>
         </Toolbar>
+        
       </AppBar>
+      
       <Box
         component="nav"
         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 }  }}

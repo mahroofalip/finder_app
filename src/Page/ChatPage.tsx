@@ -50,9 +50,7 @@ const GrayLabel = styled(Typography)({
 
 export default function ChatPage(props: any) {
   const dispatch: AppDispatch = useDispatch();
-  // const messagesList = useSelector((state: RootState) => state.message.messages);
-  // const loading = useSelector((state: RootState) => state.message.loading);
-  // const error = useSelector((state: RootState) => state.message.error);
+  
 
   const initialMessages: Message[] = [];
 
@@ -65,18 +63,10 @@ export default function ChatPage(props: any) {
     window.innerHeight * 0.6
   );
 
-  // useEffect(() => {
-  //   dispatch(loadMessages("userId")); // Replace 'userId' with actual user ID logic
-  // }, [dispatch]);
-
-  // useEffect(() => {
-  //   setMessages(messagesList);
-  // }, [messagesList]);
+  
 
   useEffect(() => {
-    // socket.emit("join-room", { room_id: "1" }); // Replace with actual room ID logic
     socket.on("receive-message", (data: Message) => {
-      alert('ok')
       console.log("Message received:", data);
       dispatch(receiveMessage(data));
     });

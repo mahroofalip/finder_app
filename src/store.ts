@@ -107,6 +107,7 @@ export interface User {
   age:string | null;
   isOnline:boolean| null;
   profileImage: string| null;
+  profileImageKey: string| null;
   city:string| null;
   id:any| null;
   gender:string| null;
@@ -116,6 +117,7 @@ export interface User {
   weight:string| null;
   eyeColor:string| null;
   hairColor:string| null;
+  updatedAt:any
 }
 
 export interface AuthState {

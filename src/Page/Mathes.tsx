@@ -32,6 +32,9 @@ import { loadFinderUsers } from "../action/usersAction";
 import { useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../store";
 import { useSelector } from "react-redux";
+import { OnlineBadge } from "../components/Badges/Badges";
+import { getTimeAgo } from "../components/TimeFunctions/TimeFunction";
+import { intewellToFetch } from "../consts";
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -48,18 +51,18 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
   }),
 }));
 
-const OnlineBadge = () => (
-  <span
-    style={{
-      width: 10,
-      height: 10,
-      borderRadius: "50%",
-      background: "#03fc5e",
-      display: "inline-block",
-      marginLeft: 5,
-    }}
-  />
-);
+// const OnlineBadge = () => (
+//   <span
+//     style={{
+//       width: 10,
+//       height: 10,
+//       borderRadius: "50%",
+//       background: "#03fc5e",
+//       display: "inline-block",
+//       marginLeft: 5,
+//     }}
+//   />
+// );
 const GrayLabel = styled(Typography)({
   color: "gray",
   marginTop: 10,
@@ -82,6 +85,8 @@ export default function MatchesCard() {
 
   const dispatch: AppDispatch = useDispatch();
   const messagesList = useSelector((state: RootState) => state.users.users);
+  const user = useSelector((state: RootState) => state.auth);
+
   // const loading = useSelector((state: RootState) => state.users.loading);
   // const error = useSelector((state: RootState) => state.users.error);
 
@@ -112,11 +117,21 @@ export default function MatchesCard() {
   };
 
   
-
-
   React.useEffect(() => {
-    dispatch(loadFinderUsers()); 
-  }, [dispatch]);
+    dispatch(loadFinderUsers());
+    const intervalId = setInterval(() => {
+      console.log(user, "useruseruseruser");
+      dispatch(loadFinderUsers());
+    }, intewellToFetch);
+  
+    // if (!user) {
+    //   clearInterval(intervalId)
+    //   return
+    // }
+
+    return () => clearInterval(intervalId);
+  }, [dispatch, user, intewellToFetch]);
+
 
   const handleExpandClick = (index: number) => {
     const expandedProfilesCopy = [...expandedProfiles];
@@ -129,6 +144,7 @@ export default function MatchesCard() {
       <Grid container spacing={2}>
         {messagesList.length !== 0 &&
           messagesList?.map((user, index) => {
+            const timeAgo = getTimeAgo(user.updatedAt);
             return (
               <>
                 <Grid key={`key${index}`} item xs={12} sm={6} md={4} lg={4} xl={3}>
@@ -160,7 +176,7 @@ export default function MatchesCard() {
                           {`${user.firstName} ${user.lastName}`}
                         </Typography>
                       }
-                      subheader={`${user.age} Min ago`}
+                      subheader={`${user.isOnline ? "Online" : timeAgo}`}
                       action={
                         <Badge
                           style={{ marginRight: 12 }}
@@ -169,7 +185,8 @@ export default function MatchesCard() {
                             vertical: "bottom",
                             horizontal: "right",
                           }}
-                          badgeContent={ user.isOnline  ? <OnlineBadge /> : <OfflineBadge/>}
+                          badgeContent={ user.isOnline  ? <OnlineBadge /> : null}
+                          // user.isOnline
                         ></Badge>
                       }
                     />
