@@ -39,7 +39,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "./store";
 import { getMe, loginUser, logoutUser, registerUser } from "./action/authActions";
 import ProfileForm from "./Page/ProfileAndEdit";
-import useUserActivity from "./components/useUserActivity/useUserActivity";
 import socket from "./socket.ts/socket";
 import { intewellToFetch } from "./consts";
 

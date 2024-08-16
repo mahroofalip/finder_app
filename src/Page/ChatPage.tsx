@@ -10,10 +10,9 @@ import {
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, Message, RootState } from "../store";
+import { useDispatch } from "react-redux";
+import { AppDispatch, Message } from "../store";
 import { receiveMessage, sendMessage } from "../action/messageActions";
 import socket from "../socket.ts/socket";
 
@@ -30,23 +29,6 @@ const OnlineBadge = () => (
   />
 );
 
-const GrayLabel = styled(Typography)({
-  color: "gray",
-  marginTop: 10,
-});
-
-// const OfflineBadge = () => (
-//   <span
-//     style={{
-//       width: 10,
-//       height: 10,
-//       borderRadius: "50%",
-//       background: "gray",
-//       display: "inline-block",
-//       marginLeft: 5,
-//     }}
-//   />
-// );
 
 export default function ChatPage(props: any) {
   const dispatch: AppDispatch = useDispatch();

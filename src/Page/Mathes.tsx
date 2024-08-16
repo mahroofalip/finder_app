@@ -51,34 +51,12 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
   }),
 }));
 
-// const OnlineBadge = () => (
-//   <span
-//     style={{
-//       width: 10,
-//       height: 10,
-//       borderRadius: "50%",
-//       background: "#03fc5e",
-//       display: "inline-block",
-//       marginLeft: 5,
-//     }}
-//   />
-// );
 const GrayLabel = styled(Typography)({
   color: "gray",
   marginTop: 10,
 });
-const OfflineBadge = () => (
-  <span
-    style={{
-      width: 10,
-      height: 10,
-      borderRadius: "50%",
-      background: "gray",
-      display: "inline-block",
-      marginLeft: 5,
-    }}
-  />
-);
+
+
 type ExpandedProfiles = boolean[];
 
 export default function MatchesCard() {
@@ -120,14 +98,8 @@ export default function MatchesCard() {
   React.useEffect(() => {
     dispatch(loadFinderUsers());
     const intervalId = setInterval(() => {
-      console.log(user, "useruseruseruser");
       dispatch(loadFinderUsers());
     }, intewellToFetch);
-  
-    // if (!user) {
-    //   clearInterval(intervalId)
-    //   return
-    // }
 
     return () => clearInterval(intervalId);
   }, [dispatch, user, intewellToFetch]);

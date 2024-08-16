@@ -109,7 +109,6 @@ const ProfileForm: React.FC = () => {
   const { eyeColorOptions } = useSelector((state: RootState) => state.eyeColorOption);
   const { hairColorOptions } = useSelector((state: RootState) => state.hairColorOption);
   const { user: authUser } = useSelector((state: RootState) => state.auth);
-const { error:updateUserErr, user: updateUser, loading:updateUserLoading } = useSelector((state: RootState) => state.updateUser);
 
 
   const [profile, setProfile] = useState<Profile>({
