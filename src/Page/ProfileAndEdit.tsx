@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Grid, TextField, Button, MenuItem, Paper, Avatar, IconButton, Typography } from '@mui/material';
+import { Grid, TextField, Button, MenuItem, Paper, Avatar, IconButton, Typography, Autocomplete, Chip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { AppDispatch, RootState } from '../store';
 import { loadGenderOptions } from '../action/genderOptionsAction';
@@ -16,6 +16,7 @@ import { getMe } from '../action/authActions';
 import CheckIcon from '@mui/icons-material/Check';
 import ErrorIcon from '@mui/icons-material/Error'; // Import error icon
 import AlertComponent from '../components/Alerts/AlertComponent';
+import { loadIntrestsOptions } from '../action/intrestsOptionsAction';
 
 
 const blue = {
@@ -88,9 +89,9 @@ interface Profile {
   profession: string;
   displayName: string;
   description: string;
+  interests: string[]; 
   place: string
   profileImageKey: string
-  // place: PlaceType | null;
 }
 
 
@@ -104,6 +105,7 @@ const ProfileForm: React.FC = () => {
   const { educationOptions } = useSelector((state: RootState) => state.educationOption);
   const { professionOptions } = useSelector((state: RootState) => state.professionOption);
   const { eyeColorOptions } = useSelector((state: RootState) => state.eyeColorOption);
+  const { intrestsOptions } = useSelector((state: RootState) => state.intrestOption);
   const { hairColorOptions } = useSelector((state: RootState) => state.hairColorOption);
   const { user: authUser } = useSelector((state: RootState) => state.auth);
 
@@ -125,14 +127,12 @@ const ProfileForm: React.FC = () => {
     displayName: '',
     description: '',
     place: '',
-    profileExt:'',
-    profileImageKey:''
+    interests:[],
+    profileExt: '',
+    profileImageKey: ''
   });
   useEffect(() => {
-    console.log(authUser,"authUser ||");
-    
     if (authUser) {
-     
       setProfile({
         firstName: authUser.firstName || '',
         lastName: authUser.lastName || '',
@@ -150,30 +150,24 @@ const ProfileForm: React.FC = () => {
         displayName: authUser.displayName || '',
         description: authUser.description || '',
         place: authUser.place || '',
-        profileExt:'',
-        profileImageKey:authUser.profileImageKey || ""
-        
-
+        profileExt: '',
+        interests: authUser?.interests
+        ? authUser.interests.split(',').map((interest: string) => interest.trim()): [], 
+        profileImageKey: authUser.profileImageKey || ""
       });
     }
   }, [authUser]);
 
-
-
   const dispatch: AppDispatch = useDispatch();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    
-      
-      dispatch(loadGenderOptions());
-      dispatch(loadEducationOptions());
-      dispatch(loadProfessionOptions());
-      dispatch(loadEyeColorOptions());
-      dispatch(loadhairColorOptions());
-      dispatch(getMe());
-    
-    
+    dispatch(loadGenderOptions());
+    dispatch(loadIntrestsOptions());
+    dispatch(loadEducationOptions());
+    dispatch(loadProfessionOptions());
+    dispatch(loadEyeColorOptions());
+    dispatch(loadhairColorOptions());
+    dispatch(getMe());
   }, [dispatch]);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -188,19 +182,34 @@ const ProfileForm: React.FC = () => {
       const reader = new FileReader();
       reader.onload = () => {
         const fileExtension = file.name.split('.').pop(); // Extract file extension
-        setProfile((prevProfile) => ({ 
-          ...prevProfile, 
+        setProfile((prevProfile) => ({
+          ...prevProfile,
           profileImage: reader.result as string,
           profileExt: fileExtension || '' // Add file extension to the state
         }));
         setErrors((prevErrors) => ({ ...prevErrors, profileImage: '' })); // Clear the avatar error
         validate();
       };
-  
+
       reader.readAsDataURL(file);
     }
   };
+  const handleInterestsChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement> | { target: { name: string; value: string[] | string } }
+  ) => {
+    const { name, value } = e.target;
+    setProfile((prevProfile) => ({
+      ...prevProfile,
+      [name]: value,  
+    }));
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: '',  
+    }));
+    validate();  
+  };
   
+
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;
@@ -220,8 +229,9 @@ const ProfileForm: React.FC = () => {
     setProfile((prevProfile) => ({ ...prevProfile, place }));
     setErrors((prevErrors) => ({ ...prevErrors, place: '' })); // Clear the place error
     validate()
-
   };
+
+  
 
   const validate = () => {
 
@@ -298,17 +308,19 @@ const ProfileForm: React.FC = () => {
 
     if (validate()) {
       try {
+        console.log(profile,"kkkkkkkkkkkkkkkkkkkkkkkkkkk");
+        
         await dispatch(updateUserProfile(profile));
         // Show success alert
         const token = localStorage.getItem("token");
 
-        
-          setAlertMessage('Your profile has been updated successfully!');
-          setAlertSeverity('success');
-          dispatch(getMe());
-          setAlertIcon(<CheckIcon fontSize="inherit" />);
-        
-        
+
+        setAlertMessage('Your profile has been updated successfully!');
+        setAlertSeverity('success');
+        dispatch(getMe());
+        setAlertIcon(<CheckIcon fontSize="inherit" />);
+
+
       } catch (error) {
         // Show error alert
         setAlertMessage('There was an error updating your profile.');
@@ -319,16 +331,15 @@ const ProfileForm: React.FC = () => {
   };
 
   useEffect(() => {
-   
+
     const timer = setTimeout(() => {
       setAlertMessage(null);
-    }, 5000); 
+    }, 5000);
     return () => clearTimeout(timer);
   }, [alertMessage]);
 
   return (
-    <Paper elevation={3} style={{ padding: '16px' }}>
-
+    <Paper elevation={3} style={{ padding: '16px', }}>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12} md={12}>
@@ -369,7 +380,7 @@ const ProfileForm: React.FC = () => {
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <label>Username</label>
+            <label >Username</label>
             <TextField
               placeholder="Username"
               name="username"
@@ -641,7 +652,41 @@ const ProfileForm: React.FC = () => {
               </Typography>
             )}
           </Grid>
+          <Grid item xs={12}>
+            <label>Interests</label>
+            
+            <Autocomplete
+              multiple
+              id="tags-filled"
+              options={intrestsOptions.map((option) => option.intrest)}
+              value={profile.interests} // Controlled value for editing form
+              defaultValue={profile.interests || []} // Default value for edit form
+              freeSolo
+              onChange={(event, newValue) => {
+                // Update the state when the user selects or removes an option
+                handleInterestsChange({ target: { name: 'interests', value: newValue } });
+              }}
+              renderTags={(value: readonly string[], getTagProps) =>
+                value.map((option: string, index: number) => {
+                  const { key, ...tagProps } = getTagProps({ index });
+                  return (
+                    <Chip variant="outlined" label={option} key={key} {...tagProps} />
+                  );
+                })
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  
+                  placeholder="Select your interests"
+                  name="interests" 
+                />
+              )}
+            />
 
+
+          </Grid>
           <Grid item xs={12}>
             <label>Description</label>
             <Textarea
@@ -660,14 +705,14 @@ const ProfileForm: React.FC = () => {
           </Grid>
           <Grid item xs={12}>
             {alertMessage && (
-              <AlertComponent 
+              <AlertComponent
                 message={alertMessage}
                 severity={alertSeverity}
                 icon={alertIcon}
               />
             )}
-           
-            <Button sx={{mt:2}} type="submit" fullWidth variant="contained" color="primary">
+
+            <Button sx={{ mt: 2 }} type="submit" fullWidth variant="contained" color="primary">
               Submit
             </Button>
           </Grid>

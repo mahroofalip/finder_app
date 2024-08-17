@@ -9,6 +9,7 @@ import eyeColorOptionsAction from './action/eyeColorAction';
 import hairColorOptionsAction from './action/hairColorAction';
 import googleMapPlaceAction from './action/googleMapPlaceAction';
 import updateUserProfile  from './action/profileAction';
+import intrestsOptionsAction from './action/intrestsOptionsAction';
 
 
 
@@ -20,6 +21,7 @@ export const store = configureStore({
     message: messageReducer,
     users:usersAction,
     genderOption:genderOptionsAction,
+    intrestOption:intrestsOptionsAction,
     educationOption:educationOptionsAction,
     professionOption:professionOptionsAction,
     eyeColorOption:eyeColorOptionsAction,
@@ -117,7 +119,8 @@ export interface User {
   weight:string| null;
   eyeColor:string| null;
   hairColor:string| null;
-  updatedAt:any
+  updatedAt:any;
+  interests: any| null; 
 }
 
 export interface AuthState {
@@ -138,6 +141,16 @@ export interface genderOptionsState {
   loading: boolean;
   error: string | null;
 }
+export interface IntrestsOption {
+  id: string;
+  intrest: string;
+}
+export interface IntrestOptionsState {
+  intrestsOptions: IntrestsOption[];
+  loading: boolean;
+  error: string | null;
+}
+
 export interface googlemapPlaceOptionsState {
   places: PlacesOption[];
   loading: boolean;

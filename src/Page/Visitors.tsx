@@ -13,8 +13,8 @@ export default function Visitors() {
             style={{
               display: "flex",
               justifyContent: "center",
-              background: "green",
-              color: "white",
+              background: "#333",
+              color: "orange",
             }}
           >
             Visitors For You

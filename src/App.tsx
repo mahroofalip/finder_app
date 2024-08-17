@@ -320,7 +320,6 @@ function App(props: Props) {
         sx={{
           flexGrow: 1,
           p: 3,
-          background:'#333',
           width: { sm: `calc(100% - ${drawerWidth}px)` },
         }}
       >
