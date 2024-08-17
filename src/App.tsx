@@ -10,6 +10,7 @@ import List from "@mui/material/List";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ListItem from "@mui/material/ListItem";
+import HomeIcon from '@mui/icons-material/Home';
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
@@ -40,7 +41,8 @@ import { RootState, AppDispatch } from "./store";
 import { getMe, loginUser, logoutUser, registerUser } from "./action/authActions";
 import ProfileForm from "./Page/ProfileAndEdit";
 import socket from "./socket.ts/socket";
-import { intewellToFetch } from "./consts";
+import { backgroundNav, intewellToFetch } from "./consts";
+import { updateUserOnlineStatus } from "./action/usersAction";
 
 const drawerWidth = 240;
 
@@ -60,29 +62,26 @@ function App(props: Props) {
   const [isAccountCreated, setAccountCreated] = React.useState(true);
   const [selectedMenuItem, setSelectedMenuItem] = React.useState("");
   const matches = useMediaQuery("(max-width:600px)");
-
   const me = useSelector((state: RootState) => state.auth);
   const user = useSelector((state: RootState) => state.auth.user);
 
-  
+
   React.useEffect(() => {
-    socket.emit('online', user);
+    dispatch(updateUserOnlineStatus());
+    const token = localStorage.getItem("token");
     const intervalId = setInterval(() => {
-      console.log(user, "useruseruseruser");
-      socket.emit('online', user);
-    },intewellToFetch);
-  
-    if (!user) {
-      clearInterval(intervalId)
-      return
-    }
+      if (!user && !token) {
+        dispatch(updateUserOnlineStatus());
+      }
+    }, intewellToFetch);
     return () => clearInterval(intervalId);
-  }, [user, intewellToFetch]);
-  
+  }, [dispatch, user, intewellToFetch]);
+
+
 
   React.useEffect(() => {
     const token = localStorage.getItem("token");
-   
+
     if (token || user?.status === "success") {
       setLoggedIn(true);
 
@@ -129,12 +128,7 @@ function App(props: Props) {
   const displayLogin = () => {
     setAccountCreated(true);
   };
-  React.useEffect(() => {
-  
-    return () => {
-       socket.emit('offline', me.user);
-    };
-  }, []);
+
   const handleMenuItemClick = (text: string) => {
     if (text === "Logout") {
       logoutFn()
@@ -142,12 +136,17 @@ function App(props: Props) {
       setSelectedMenuItem(text);
     }
   };
-  const logoutFn = ()=>{
+  const logoutFn = () => {
     setLoggedIn(false);
-      socket.emit('offline', me.user);
-      dispatch(logoutUser());
-      setSelectedMenuItem("");
+    dispatch(logoutUser());
+    setSelectedMenuItem("");
   }
+  React.useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!user && !token) {
+      logoutFn()
+    }
+  }, [])
   const handleDrawerClose = () => {
     setIsClosing(true);
     setMobileOpen(false);
@@ -163,13 +162,16 @@ function App(props: Props) {
     }
   };
   React.useEffect(() => {
+
+    const token = localStorage.getItem("token");
     dispatch(getMe());
   }, [dispatch]);
+
   const drawer = (
     <div className="hide-scrollbar" style={{ overflowY: "auto", height: "100%" }}>
       {matches && (
         <Toolbar>
-          <Avatar alt="Remy Sharp" src={me.user?.profileImage || ""}  />
+          <Avatar alt="Remy Sharp" src={me?.user?.profileImage || ""} />
           <img
             height={30}
             src="https://cdn.logojoy.com/wp-content/uploads/2018/05/01140918/958-768x591.png"
@@ -188,9 +190,10 @@ function App(props: Props) {
       )}
 
       <Divider />
-          
+
       <List className="bg-Body">
         {[
+          "Posts",
           "Profile",
           "Matches",
           "Search",
@@ -204,15 +207,16 @@ function App(props: Props) {
           <ListItem key={text} onClick={() => handleMenuItemClick(text)}>
             <ListItemButton>
               <ListItemIcon>
-                {index === 0 && <PersonIcon sx={{ color: "green" }} />}
-                {index === 1 && <SignLanguageIcon sx={{ color: "skyblue" }} />}
-                {index === 2 && <SearchOutlinedIcon sx={{ color: "black" }} />}
-                {index === 3 && <RemoveRedEyeIcon sx={{ color: "greenyellow" }} />}
-                {index === 4 && <FavoriteBorderIcon sx={{ color: "red" }} />}
-                {index === 5 && <MessageIcon sx={{ color: "blue" }} />}
-                {index === 6 && <ThumbDownOffAltIcon sx={{ color: "rosybrown" }} />}
-                {index === 7 && <BlockOutlinedIcon sx={{ color: "orange" }} />}
-                {index === 8 && <LoginIcon sx={{ color: "black" }} />}
+                {index === 0 && <HomeIcon sx={{ color: "orange" }} />}
+                {index === 1 && <PersonIcon sx={{ color: "orange" }} />}
+                {index === 2 && <SignLanguageIcon sx={{ color: "orange" }} />}
+                {index === 3 && <SearchOutlinedIcon sx={{ color: "orange" }} />}
+                {index === 4 && <RemoveRedEyeIcon sx={{ color: "orange" }} />}
+                {index === 5 && <FavoriteBorderIcon sx={{ color: "orange" }} />}
+                {index === 6 && <MessageIcon sx={{ color: "orange" }} />}
+                {index === 7 && <ThumbDownOffAltIcon sx={{ color: "orange" }} />}
+                {index === 8 && <BlockOutlinedIcon sx={{ color: "orange" }} />}
+                {index === 9 && <LoginIcon sx={{ color: "orange" }} />}
               </ListItemIcon>
               <ListItemText primary={text} />
             </ListItemButton>
@@ -227,7 +231,7 @@ function App(props: Props) {
     window !== undefined ? () => window().document.body : undefined;
 
   return isLoggedIn ? (
-    <Box sx={{ display: "flex" , }}>
+    <Box sx={{ display: "flex", }}>
       <CssBaseline />
       <AppBar
         position="fixed"
@@ -235,7 +239,7 @@ function App(props: Props) {
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
           background:
-            "linear-gradient(90deg, rgba(255,2,254,1) 0%, rgba(140,59,247,1) 4%, rgba(225,27,254,1) 47%, rgba(198,49,254,1) 66%, rgba(254,44,207,1) 99%, rgba(24,115,240,1) 100%, rgba(155,84,254,1) 100%, rgba(0,212,255,1) 100%)",
+            backgroundNav,
         }}
       >
         <Toolbar>
@@ -248,16 +252,16 @@ function App(props: Props) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
+          <Typography variant="h6" noWrap sx={{ color: "orange" }} component="div">
             {selectedMenuItem}
           </Typography>
         </Toolbar>
-        
+
       </AppBar>
-      
+
       <Box
         component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 }  }}
+        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
         aria-label="mailbox folders"
       >
         <Drawer
@@ -286,31 +290,26 @@ function App(props: Props) {
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,
-              
+
             },
           }}
-          
+
           open
         >
-          <Toolbar>
-            <Avatar
-              alt="Remy Sharp"
-              src={me.user?.profileImage || ""}             />
+          <Toolbar sx={{ background: backgroundNav }}>
+            
+              <Avatar
+                alt={`${me?.user?.firstName} ${me?.user?.lastName}`}
+                src={me?.user?.profileImage || ""} />
+              <FavoriteBorderIcon sx={{ fontWeight: "bold", marginLeft: "20px", color: "orange" }} />
+              <Typography
+                sx={{ fontWeight: "bold", marginLeft: "5px", color: "orange" }}
+              >
+                {"Finder"}
+              </Typography>
 
-            <img
-              height={20}
-              src="https://cdn.logojoy.com/wp-content/uploads/2018/05/01140918/958-768x591.png"
-              alt="logo"
-              style={{ paddingLeft: "25px" }}
-            />
-            <Typography
-              sx={{ fontWeight: "bold", marginLeft: "5px", color: "#f516e6" }}
-            >
-              {"Finder"}
-            </Typography>
-            <IconButton style={{ marginLeft: "10px" }} aria-label="delete">
-              <SettingsIcon />
-            </IconButton>
+
+
           </Toolbar>
 
           {drawer}
@@ -321,6 +320,7 @@ function App(props: Props) {
         sx={{
           flexGrow: 1,
           p: 3,
+          background:'#333',
           width: { sm: `calc(100% - ${drawerWidth}px)` },
         }}
       >
@@ -330,7 +330,7 @@ function App(props: Props) {
             <ProfileForm />
           </>
         )}
-        
+
         {selectedMenuItem === "Matches" && (
           <>
             <MatchesCard />
@@ -377,7 +377,7 @@ function App(props: Props) {
           sx={{
             height: "10%",
             background:
-              "linear-gradient(90deg, rgba(255,2,254,1) 0%, rgba(140,59,247,1) 4%, rgba(225,27,254,1) 47%, rgba(198,49,254,1) 66%, rgba(254,44,207,1) 99%, rgba(24,115,240,1) 100%, rgba(155,84,254,1) 100%, rgba(0,212,255,1) 100%)",
+              backgroundNav,
           }}
         ></AppBar>
         <Box

@@ -20,13 +20,11 @@ import Badge from "@mui/material/Badge";
 import { Chip } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
-
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-
 import ResponsiveMessageBox from "../components/MessageBox/MessageBox";
 import { loadFinderUsers } from "../action/usersAction";
 import { useDispatch } from "react-redux";
@@ -62,15 +60,13 @@ type ExpandedProfiles = boolean[];
 export default function MatchesCard() {
 
   const dispatch: AppDispatch = useDispatch();
-  const messagesList = useSelector((state: RootState) => state.users.users);
+  const users = useSelector((state: RootState) => state.users.users);
   const user = useSelector((state: RootState) => state.auth);
 
-  // const loading = useSelector((state: RootState) => state.users.loading);
-  // const error = useSelector((state: RootState) => state.users.error);
+  
 
   const [expandedProfiles, setExpandedProfiles] =
-    React.useState<ExpandedProfiles>([]);
-  // const [users, setUsers] = React.useState<any[]>([]);
+  React.useState<ExpandedProfiles>([]);
   const matches = useMediaQuery("(max-width:600px)");
 
   const [open, setOpen] = React.useState(false);
@@ -114,9 +110,9 @@ export default function MatchesCard() {
   return (
     <>
       <Grid container spacing={2}>
-        {messagesList.length !== 0 &&
-          messagesList?.map((user, index) => {
-            const timeAgo = getTimeAgo(user.updatedAt);
+        {users.length !== 0 &&
+          users?.map((user, index) => {
+            const timeAgo = getTimeAgo(user?.updatedAt);
             return (
               <>
                 <Grid key={`key${index}`} item xs={12} sm={6} md={4} lg={4} xl={3}>
@@ -145,10 +141,10 @@ export default function MatchesCard() {
                           color={"black"}
                           fontWeight="600"
                         >
-                          {`${user.firstName} ${user.lastName}`}
+                          {`${user?.firstName} ${user?.lastName}`}
                         </Typography>
                       }
-                      subheader={`${user.isOnline ? "Online" : timeAgo}`}
+                      subheader={`${user?.isOnline ? "Online" : timeAgo}`}
                       action={
                         <Badge
                           style={{ marginRight: 12 }}
@@ -157,7 +153,7 @@ export default function MatchesCard() {
                             vertical: "bottom",
                             horizontal: "right",
                           }}
-                          badgeContent={ user.isOnline  ? <OnlineBadge /> : null}
+                          badgeContent={ user?.isOnline  ? <OnlineBadge /> : null}
                           // user.isOnline
                         ></Badge>
                       }
@@ -170,7 +166,7 @@ export default function MatchesCard() {
                     />
                     <CardContent sx={{ margin: 0 }}>
                       <h5 style={{ padding: 0, margin: 0 }}>
-                        Age: {user.age}, {user.city}
+                        Age: {user?.age}, {user?.city}
                       </h5>
                       <h6 style={{ padding: 0, margin: 0 }}>
                         Working in Legal Professional
@@ -261,7 +257,7 @@ export default function MatchesCard() {
                         <Typography variant="h6" paragraph>
                           Basic Info:
                         </Typography>
-                        <div key={user.id}>
+                        <div key={user?.id}>
                           <Typography variant="subtitle2">
                             <GrayLabel variant="inherit">Gender</GrayLabel>
                             {user["gender"]}

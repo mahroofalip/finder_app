@@ -122,28 +122,28 @@ export const registerUser =
     }
   };
 
-export const getMe = () => async (dispatch: AppDispatch) => {
-  const token = localStorage.getItem("token"); 
+  export const getMe = () => async (dispatch: AppDispatch) => {
+    const token = localStorage.getItem("token"); 
   dispatch(getMeStart());
-  try {
-    const response = await axios.get("http://localhost:5000/api/users/getMe", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, 
-      },
-    });
-
+    try {
+      const response = await axios.get("http://localhost:5000/api/users/getMe", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, 
+        },
+      });
+  
     console.log(response.data.user,"response.data");
     
     dispatch(getMeSuccess(response.data.user));
-  } catch (error: any) {
+        } catch (error: any) {
     dispatch(getMeFailure(error.message));
-  }
-};
-
-export const logoutUser = () => (dispatch: AppDispatch) => {
-  localStorage.removeItem("token");
-  dispatch(logout());
-};
+    }
+  };
+  
+  export const logoutUser = () => (dispatch: AppDispatch) => {
+    localStorage.removeItem("token");
+    dispatch(logout());
+  };
 
 export default userSlice.reducer;

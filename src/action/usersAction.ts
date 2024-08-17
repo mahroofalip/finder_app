@@ -6,7 +6,7 @@ const initialState: UserState = {
     users: [],
     loading: false,
     error: null,
-    user:null
+    user: null
 };
 
 const userSlice = createSlice({
@@ -25,6 +25,15 @@ const userSlice = createSlice({
             state.loading = false;
             state.error = action.payload;
         },
+        updateOnlineStatusStart: (state) => {
+            state.loading = true;
+        },
+        updatOnlineStatusSuccess: (state, action: PayloadAction<User[]>) => {
+            state.loading = false;
+        },
+        updateOnlineStatusFailure: (state, action: PayloadAction<string>) => {
+            state.loading = false;
+        },
     },
 });
 
@@ -32,6 +41,9 @@ export const {
     loadUsersStart,
     loadUsersSuccess,
     loadUsersFailure,
+    updateOnlineStatusStart,
+    updatOnlineStatusSuccess,
+    updateOnlineStatusFailure
 } = userSlice.actions;
 
 export const loadFinderUsers = () => async (dispatch: AppDispatch) => {
@@ -50,5 +62,23 @@ export const loadFinderUsers = () => async (dispatch: AppDispatch) => {
     }
 };
 
+export const updateUserOnlineStatus =
+    () => async () => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            axios.get(
+                "http://localhost:5000/api/users/update-online",
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+        }
 
+    };
+
+
+// update-online
 export default userSlice.reducer;

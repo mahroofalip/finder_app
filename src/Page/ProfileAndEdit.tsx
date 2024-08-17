@@ -93,10 +93,7 @@ interface Profile {
   // place: PlaceType | null;
 }
 
-// interface PlaceType {
-//   description: string| null;
-//   place_id: string| null;
-// }
+
 
 const ProfileForm: React.FC = () => {
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
@@ -132,6 +129,8 @@ const ProfileForm: React.FC = () => {
     profileImageKey:''
   });
   useEffect(() => {
+    console.log(authUser,"authUser ||");
+    
     if (authUser) {
      
       setProfile({
@@ -164,12 +163,17 @@ const ProfileForm: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(loadGenderOptions());
-    dispatch(loadEducationOptions());
-    dispatch(loadProfessionOptions());
-    dispatch(loadEyeColorOptions());
-    dispatch(loadhairColorOptions());
-    dispatch(getMe());
+    const token = localStorage.getItem("token");
+    
+      
+      dispatch(loadGenderOptions());
+      dispatch(loadEducationOptions());
+      dispatch(loadProfessionOptions());
+      dispatch(loadEyeColorOptions());
+      dispatch(loadhairColorOptions());
+      dispatch(getMe());
+    
+    
   }, [dispatch]);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -296,10 +300,15 @@ const ProfileForm: React.FC = () => {
       try {
         await dispatch(updateUserProfile(profile));
         // Show success alert
-        setAlertMessage('Your profile has been updated successfully!');
-        setAlertSeverity('success');
-        dispatch(getMe());
-        setAlertIcon(<CheckIcon fontSize="inherit" />);
+        const token = localStorage.getItem("token");
+
+        
+          setAlertMessage('Your profile has been updated successfully!');
+          setAlertSeverity('success');
+          dispatch(getMe());
+          setAlertIcon(<CheckIcon fontSize="inherit" />);
+        
+        
       } catch (error) {
         // Show error alert
         setAlertMessage('There was an error updating your profile.');

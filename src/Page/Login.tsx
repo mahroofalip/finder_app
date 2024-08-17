@@ -41,7 +41,7 @@ const defaultTheme = createTheme();
 const Login:React.FC<LoginProps> = ({ showRegisterPage,loginSubmit }) => {
 
 
-  const loading = useSelector((state: RootState) => state.auth.loading);
+  const auth = useSelector((state: RootState) => state.auth);
   
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -123,7 +123,7 @@ const Login:React.FC<LoginProps> = ({ showRegisterPage,loginSubmit }) => {
               label="Remember me"
             />
               <ButtonWithLoader
-              loading={loading}
+              loading={auth.loading}
               fullWidth={true}
               variant="contained"
               type="submit"
