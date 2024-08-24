@@ -3,6 +3,7 @@ import {
 } from "@mui/material";
 
 import MatchesCard from "./Mathes";
+import { backgroundNav } from "../consts";
 
 export default function Visitors() {
  
@@ -12,8 +13,7 @@ export default function Visitors() {
           <div
             style={{
               display: "flex",
-              justifyContent: "center",
-              background: "#333",
+              background: backgroundNav,
               color: "orange",
             }}
           >

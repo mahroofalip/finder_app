@@ -12,71 +12,45 @@ import SendIcon from "@mui/icons-material/Send";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import IconButton from "@mui/material/IconButton";
 import { useDispatch } from "react-redux";
-import { AppDispatch, Message } from "../store";
-import { receiveMessage, sendMessage } from "../action/messageActions";
+import { AppDispatch, Message, RootState } from "../store";
+import { getMessagesByRoomId, pushReciverNewMessage, sendMessage } from "../action/messageActions";
 import socket from "../socket.ts/socket";
-
-const OnlineBadge = () => (
-  <span
-    style={{
-      width: 10,
-      height: 10,
-      borderRadius: "50%",
-      background: "#03fc5e",
-      display: "inline-block",
-      marginLeft: 5,
-    }}
-  />
-);
-
+import { useSelector } from "react-redux";
+import { calculateAge } from "../util";
+import { getTimeAgo } from "../components/TimeFunctions/TimeFunction";
+import { OnlineBadge } from "../components/Badges/Badges";
 
 export default function ChatPage(props: any) {
   const dispatch: AppDispatch = useDispatch();
-  
-
-  const initialMessages: Message[] = [];
 
   const token = localStorage.getItem("token") ?? "";
-
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const selectedMessages = useSelector((state: RootState) => state.message.selectedMessages);
   const [newMessage, setNewMessage] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [chatHeight, setChatHeight] = useState<number>(
     window.innerHeight * 0.6
   );
 
-  
-
+  // Load messages when the component mounts
   useEffect(() => {
-    socket.on("receive-message", (data: Message) => {
-      console.log("Message received:", data);
-      dispatch(receiveMessage(data));
-    });
+    if (props.messageRoom.id) {
+     
+      dispatch(getMessagesByRoomId(props.messageRoom.id));
+      
+    }
+  }, [dispatch, props.messageRoom.id]);
 
-    return () => {
-      socket.off("receive-message");
-      socket.disconnect();
+  // Listen for incoming messages
+  useEffect(() => {
+    const handleReceiveMessage = (data: any) => {
+     dispatch(pushReciverNewMessage(data));
     };
-  }, [dispatch]);
+    socket.on("receive-message", handleReceiveMessage);
+  }, []);
 
   const submitMessage = () => {
     if (newMessage.trim() !== "") {
-      const currentTime = new Date().toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-      const message: Message = {
-        message_content: newMessage.trim(),
-        timestamp: currentTime,
-        id: "a", // Generate unique ID for the message
-        receiverId: "4", // Replace with actual receiver ID logic
-        senderId: "1", // Replace with actual sender ID logic
-        room_id: "1", // Replace with actual room ID logic
-        status: "unread",
-      };
-
-      dispatch(sendMessage(message));
-      // socket.emit("send-message", message);
+      dispatch(sendMessage(newMessage, props.messageRoom.id));
       setNewMessage("");
     }
   };
@@ -92,7 +66,7 @@ export default function ChatPage(props: any) {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [selectedMessages]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -133,12 +107,18 @@ export default function ChatPage(props: any) {
           }
           title={
             <Typography variant="body1" color={"black"}>
-              Mahroof Ali, 28, Malappuram
+              {props?.messageRoom?.Receiver.firstName}
+              {props?.messageRoom?.Receiver.lastName},
+              {calculateAge(props?.messageRoom?.Receiver?.birthDate)},
+              {props?.messageRoom?.Receiver.place}
             </Typography>
           }
           subheader={
             <Typography>
-              {`${4} Min ago`} <OnlineBadge />
+              {props?.messageRoom?.Receiver?.isOnline
+                ? "Online"
+                : getTimeAgo(props?.messageRoom?.Receiver?.updatedAt)}
+              <OnlineBadge />
             </Typography>
           }
         />
@@ -147,7 +127,7 @@ export default function ChatPage(props: any) {
       <div
         style={{
           border: "1px solid #ded9d9",
-          height: chatHeight, // Dynamic height based on viewport
+          height: chatHeight,
           padding: 15,
           display: "flex",
           flexDirection: "column",
@@ -161,12 +141,11 @@ export default function ChatPage(props: any) {
             overflowY: "scroll",
             flexGrow: 1,
             marginBottom: 10,
-            // Hide scrollbar but allow scrolling
-            scrollbarWidth: "none", // Firefox
-            msOverflowStyle: "none", // Internet Explorer 10+
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
           }}
         >
-          {messages.map((msg, index) => (
+          {selectedMessages.map((msg:any, index:any) => (
             <div
               key={index}
               style={{
@@ -190,7 +169,6 @@ export default function ChatPage(props: any) {
         </div>
         <TextField
           fullWidth
-          id="standard-error-helper-text"
           autoFocus
           value={newMessage}
           variant="outlined"

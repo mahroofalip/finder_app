@@ -7,6 +7,7 @@ import { AppDispatch, Chat, Message, MessageState } from '../store';
 
 const initialState: MessageState = {
     messages: [],
+    selectedMessages:[],
     chat:null,
     loading: false,
     error: null,
@@ -22,14 +23,22 @@ const messageSlice = createSlice({
         },
         sendMessageSuccess: (state, action: PayloadAction<Message>) => {
             state.loading = false;
-            state.messages.push(action.payload);
+            state.selectedMessages.push(action.payload);
         },
         sendMessageFailure: (state, action: PayloadAction<string>) => {
             state.loading = false;
             state.error = action.payload;
         },
-        receiveMessage: (state, action: PayloadAction<Message>) => {
-            state.messages.push(action.payload);
+        receiveMessageStart: (state) => {
+            // state.messages = []
+            state.loading = true;
+        },
+        receiveMessageSuccess: (state, action: PayloadAction<Message>) => {
+            state.selectedMessages = action.payload;
+            state.loading = false;
+        },
+        receiveMessageFailure: (state, action: PayloadAction<Message>) => {
+            state.loading = false;
         },
         loadUserChatsStart: (state) => {
             state.loading = true;
@@ -63,7 +72,9 @@ export const {
     sendMessageStart,
     sendMessageSuccess,
     sendMessageFailure,
-    receiveMessage,
+    receiveMessageFailure,
+    receiveMessageStart,
+    receiveMessageSuccess,
     loadUserChatsStart,
     loadUserChatsSuccess,
     loadUserChatsFailure,
@@ -72,20 +83,26 @@ export const {
     createRoomFailure
 } = messageSlice.actions;
 
-export const sendMessage = (messageData: Message) => async (dispatch: AppDispatch) => {
+export const sendMessage = (newMessage: any,roomId:any) => async (dispatch: AppDispatch) => {
     dispatch(sendMessageStart());
     try {
         const token = localStorage.getItem('token'); // Retrieve the token from local storage
-        const response = await axios.post('http://localhost:5000/api/messages/sendMessage', messageData, {
+        const response = await axios.post('http://localhost:5000/api/messages/createNewMessage', {newMessage,roomId}, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}` // Include the token in the Authorization header
             },
         });
-        dispatch(sendMessageSuccess(response.data));
+        
+        // dispatch(sendMessageSuccess(response.data.message));
     } catch (error: any) {
         dispatch(sendMessageFailure(error.message));
     }
+};
+export const pushReciverNewMessage = (message: any) => async (dispatch: AppDispatch) => {
+  
+        dispatch(sendMessageSuccess(message));
+    
 };
 
 export const loadUserChats = () => async (dispatch: AppDispatch) => {
@@ -109,8 +126,7 @@ export const createRoom = (sender_id : any,receiver_id:any,message_content:any) 
     try {
         const token = localStorage.getItem('token'); 
 
-        console.log(receiver_id,"step receiver_id");
-        console.log(sender_id,"step sender_id");
+       
 
         const response = await axios.post('http://localhost:5000/api/messages/createRoomAndSendMessage', {receiver_id,sender_id,message_content}, {
             headers: {
@@ -121,6 +137,23 @@ export const createRoom = (sender_id : any,receiver_id:any,message_content:any) 
         dispatch(createRoomSuccess(response.data));
     } catch (error: any) {
         dispatch(createRoomFailure(error.message));
+    }
+};
+
+export const getMessagesByRoomId = (roomId: Message) => async (dispatch: AppDispatch) => {
+    dispatch(receiveMessageStart());
+    try {
+        const token = localStorage.getItem('token'); // Retrieve the token from local storage
+        const response = await axios.post('http://localhost:5000/api/messages/getMessagesByRoomId',{roomId}, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Include the token in the Authorization header
+            },
+        });
+        
+        dispatch(receiveMessageSuccess(response.data.messages));
+    } catch (error: any) {
+        dispatch(receiveMessageFailure(error.message));
     }
 };
 

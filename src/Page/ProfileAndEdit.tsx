@@ -90,6 +90,7 @@ interface Profile {
   displayName: string;
   description: string;
   interests: string[]; 
+  lookingFor:string[]; 
   place: string
   profileImageKey: string
 }
@@ -128,6 +129,7 @@ const ProfileForm: React.FC = () => {
     description: '',
     place: '',
     interests:[],
+    lookingFor:[],
     profileExt: '',
     profileImageKey: ''
   });
@@ -153,7 +155,9 @@ const ProfileForm: React.FC = () => {
         profileExt: '',
         interests: authUser?.interests
         ? authUser.interests.split(',').map((interest: string) => interest.trim()): [], 
-        profileImageKey: authUser.profileImageKey || ""
+        profileImageKey: authUser.profileImageKey || "",
+        lookingFor:authUser?.lookingFor
+        ? authUser.lookingFor.split(',').map((gender: string) => gender.trim()): [],
       });
     }
   }, [authUser]);
@@ -194,7 +198,7 @@ const ProfileForm: React.FC = () => {
       reader.readAsDataURL(file);
     }
   };
-  const handleInterestsChange = (
+  const handleSearchAndChangeOptions = (
     e: React.ChangeEvent<HTMLTextAreaElement> | { target: { name: string; value: string[] | string } }
   ) => {
     const { name, value } = e.target;
@@ -308,7 +312,7 @@ const ProfileForm: React.FC = () => {
 
     if (validate()) {
       try {
-        console.log(profile,"kkkkkkkkkkkkkkkkkkkkkkkkkkk");
+      
         
         await dispatch(updateUserProfile(profile));
         // Show success alert
@@ -652,19 +656,52 @@ const ProfileForm: React.FC = () => {
               </Typography>
             )}
           </Grid>
-          <Grid item xs={12}>
-            <label>Interests</label>
+          <Grid item xs={12} md={6}>
+            <label>Looking For</label>
             
             <Autocomplete
               multiple
               id="tags-filled"
+              options={genderOptions.map((option) => option.gender)}
+              value={profile.lookingFor} 
+              defaultValue={profile.lookingFor || []} 
+              size='small'
+              onChange={(event, newValue) => {
+                handleSearchAndChangeOptions({ target: { name: 'lookingFor', value: newValue } });
+              }}
+              renderTags={(value: readonly string[], getTagProps) =>
+                value.map((option: string, index: number) => {
+                  const { key, ...tagProps } = getTagProps({ index });
+                  return (
+                    <Chip variant="outlined" label={option} key={key} {...tagProps} />
+                  );
+                })
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  placeholder="Select your lookingFor"
+                  name="lookingFor" 
+                />
+              )}
+            />
+
+
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <label>Interests</label>
+            <Autocomplete
+              multiple
+              id="tags-filled"
+              size='small'
               options={intrestsOptions.map((option) => option.intrest)}
               value={profile.interests} // Controlled value for editing form
               defaultValue={profile.interests || []} // Default value for edit form
               freeSolo
               onChange={(event, newValue) => {
                 // Update the state when the user selects or removes an option
-                handleInterestsChange({ target: { name: 'interests', value: newValue } });
+                handleSearchAndChangeOptions({ target: { name: 'interests', value: newValue } });
               }}
               renderTags={(value: readonly string[], getTagProps) =>
                 value.map((option: string, index: number) => {
@@ -696,6 +733,7 @@ const ProfileForm: React.FC = () => {
               id="description"
               value={profile.description}
               onChange={handleTextareaChange}
+              maxLength={1995} 
             />
             {errors.description && (
               <Typography color="error" variant="body2">

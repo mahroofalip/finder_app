@@ -4,6 +4,7 @@ import { AppDispatch, User, UserState, } from '../store';
 
 const initialState: UserState = {
     users: [],
+    profile:null,
     loading: false,
     error: null,
     user: null

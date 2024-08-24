@@ -106,14 +106,12 @@ export const registerUser =
           },
         }
       );
-      console.log(response, "response");
 
       const token = response.data.token;
       localStorage.setItem("token", token);
 
       dispatch(registerSuccess(response.data));
     } catch (error: any) {
-      console.log(error.response.data, "error.response.data");
       if (error?.response?.data?.status === "exist") {
         dispatch(registerExistingUser(error.response.data));
       } else {
@@ -133,7 +131,6 @@ export const registerUser =
         },
       });
   
-    console.log(response.data.user,"response.data");
     
     dispatch(getMeSuccess(response.data.user));
         } catch (error: any) {

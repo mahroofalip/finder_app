@@ -12,6 +12,9 @@ import { useDispatch } from "react-redux";
 import { AppDispatch, Message, RootState } from "../store";
 import { useSelector } from "react-redux";
 import socket from "../socket.ts/socket";
+import { calculateAge } from "../util";
+import { getTimeAgo } from "../components/TimeFunctions/TimeFunction";
+import { OnlineBadge } from "../components/Badges/Badges";
 
 interface User {
   name: {
@@ -27,6 +30,7 @@ interface User {
 }
 
 const Messages: React.FC = () => {
+
   const chatRooms = useSelector((state: RootState) => state.message.messages);
 
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
@@ -35,7 +39,7 @@ const Messages: React.FC = () => {
   React.useEffect(() => {
     dispatch(loadUserChats()); // Fetch users from your backend
   }, [dispatch]);
-  
+
 
   React.useEffect(() => {
     socket.on("receive-message", (data: Message) => {
@@ -52,12 +56,14 @@ const Messages: React.FC = () => {
     setSelectedUser(user);
   };
   const nullfyUserSelect = () => {
-    setSelectedUser(null) 
-   };
+    setSelectedUser(null)
+    dispatch(loadUserChats());
+  };
+
   return (
     <>
       {selectedUser ? (
-        <ChatPage backToMessageList={nullfyUserSelect} user={selectedUser} onClose={() => setSelectedUser(null)} />
+        <ChatPage backToMessageList={nullfyUserSelect} messageRoom={selectedUser} onClose={() => setSelectedUser(null)} />
       ) : (
         <List sx={{ width: "100%", bgcolor: "background.paper" }}>
           {chatRooms.map((chat: any, index: any) => (
@@ -68,10 +74,10 @@ const Messages: React.FC = () => {
                 onClick={() => handleUserClick(chat)}
               >
                 <ListItemAvatar>
-                  <Avatar alt={""} src={chat.Receiver.profileImage} />
+                  <Avatar alt={""} src={chat?.Receiver?.profileImage} />
                 </ListItemAvatar>
                 <ListItemText
-                  primary={`${chat?.Receiver?.firstName} ${chat?.Receiver?.lastName}, ${chat?.Receiver?.age}`}
+                  primary={`${chat?.Receiver?.firstName}  ${chat?.Receiver?.lastName}, ${calculateAge(chat?.Receiver?.birthDate)}`}
                   secondary={
                     <React.Fragment>
                       <div
@@ -86,7 +92,7 @@ const Messages: React.FC = () => {
                           variant="body2"
                           color="gray"
                         >
-                          You: {chat.last_message_content}
+                          You: {chat?.last_message_content} 
                         </Typography>
                         <Typography
                           sx={{ display: "inline" }}
@@ -94,8 +100,8 @@ const Messages: React.FC = () => {
                           variant="body2"
                           color="gray"
                         >
-                          Today
-                        </Typography>
+                        {chat?.isOnline ? "Online" : getTimeAgo(chat?.Receiver?.updatedAt)} <OnlineBadge />  
+                          </Typography>
                       </div>
                     </React.Fragment>
                   }

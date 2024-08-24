@@ -18,3 +18,17 @@ export default function detectUrlType(url:any) {
     return false;
   }
   
+
+  export const calculateAge = (birthDate: any) => {
+    const birth = new Date(birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDifference = today.getMonth() - birth.getMonth();
+  
+    // Adjust age if the birthday hasn't occurred yet this year
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+  
+    return age;
+  };

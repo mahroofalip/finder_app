@@ -33,6 +33,9 @@ import { useSelector } from "react-redux";
 import { OnlineBadge } from "../components/Badges/Badges";
 import { getTimeAgo } from "../components/TimeFunctions/TimeFunction";
 import { intewellToFetch } from "../consts";
+import { getProfile } from "../action/profileAction";
+import { calculateAge } from "../util";
+import InterestsComponent from "../components/Interests/InterestsChip";
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -62,27 +65,29 @@ export default function MatchesCard() {
   const dispatch: AppDispatch = useDispatch();
   const users = useSelector((state: RootState) => state.users.users);
   const user = useSelector((state: RootState) => state.auth);
+  const { profile, loading, error } = useSelector((state: RootState) => state.updateUser);
 
-  
+
 
   const [expandedProfiles, setExpandedProfiles] =
-  React.useState<ExpandedProfiles>([]);
+    React.useState<ExpandedProfiles>([]);
   const matches = useMediaQuery("(max-width:600px)");
 
   const [open, setOpen] = React.useState(false);
   const [like, setLike] = React.useState(false);
-  const [selectedUser,setSelectedUser]  = React.useState(null);
+  const [selectedUser, setSelectedUser] = React.useState(null);
   const handleLike = () => {
     setLike(!like);
   };
-  const handleClickOpenMessage = (user:any) => {
+  const handleClickOpenMessage = (user: any) => {
     setSelectedUser(user)
     setOpenMessage(true);
   };
 
   const [openMessage, setOpenMessage] = React.useState(false);
 
-  const handleClickOpen = () => {
+  const handleClickOpen = (id?: any) => {
+    dispatch(getProfile(id));
     setOpen(true);
   };
 
@@ -90,7 +95,7 @@ export default function MatchesCard() {
     setOpen(false);
   };
 
-  
+
   React.useEffect(() => {
     dispatch(loadFinderUsers());
     const intervalId = setInterval(() => {
@@ -153,8 +158,8 @@ export default function MatchesCard() {
                             vertical: "bottom",
                             horizontal: "right",
                           }}
-                          badgeContent={ user?.isOnline  ? <OnlineBadge /> : null}
-                          // user.isOnline
+                          badgeContent={user?.isOnline ? <OnlineBadge /> : null}
+                        // user.isOnline
                         ></Badge>
                       }
                     />
@@ -166,21 +171,20 @@ export default function MatchesCard() {
                     />
                     <CardContent sx={{ margin: 0 }}>
                       <h5 style={{ padding: 0, margin: 0 }}>
-                        Age: {user?.age}, {user?.city}
+                        Age: {calculateAge(user?.birthDate)} , {user?.place}
                       </h5>
                       <h6 style={{ padding: 0, margin: 0 }}>
-                        Working in Legal Professional
+                        {user?.profession}
                       </h6>
 
                       <h6 style={{ padding: 0, margin: 0 }}>
-                        Studied Higher Secondary / Intermediate
+                        {user?.education}
                       </h6>
                     </CardContent>
                     <CardActions sx={{ Padding: 0, margin: 0 }} disableSpacing>
                       <IconButton
-                       
                         aria-label="send message"
-                        onClick={()=>handleClickOpenMessage(user)}
+                        onClick={() => handleClickOpenMessage(user)}
                       >
                         <MessageOutlinedIcon sx={{ color: "#4287f5" }} />
                       </IconButton>
@@ -211,7 +215,9 @@ export default function MatchesCard() {
                       ) : (
                         <div style={{ marginLeft: "auto" }}>
                           <IconButton
-                            onClick={handleClickOpen}
+                            onClick={() => {
+                              handleClickOpen(user.id)
+                            }}
                             aria-label="info"
                           >
                             <InfoIcon sx={{ color: "#4287f5" }} />
@@ -233,25 +239,14 @@ export default function MatchesCard() {
                             marginBottom: "10px",
                           }}
                         >
-                          <Chip label="Small" size="small" variant="outlined" />
-                          <Chip label="Small" size="small" variant="outlined" />
-                          <Chip label="Small" size="small" variant="outlined" />
-                          <Chip label="Small" size="small" variant="outlined" />
-                          <Chip label="Small" size="small" variant="outlined" />
-                          <Chip label="Small" size="small" variant="outlined" />
-                          <Chip label="Small" size="small" variant="outlined" />
-                          <Chip label="Small" size="small" variant="outlined" />
-                          <Chip label="Small" size="small" variant="outlined" />
-                          <Chip label="Small" size="small" variant="outlined" />
+                          {user?.interests && <InterestsComponent interests={user?.interests} />}
                         </div>
 
                         <Typography variant="h6" paragraph>
                           About:
                         </Typography>
                         <Typography variant="subtitle1" paragraph>
-                          Dating me is like dating the funniest person you've
-                          ever met… and the most humble.
-                        </Typography>
+                          {user?.description}                        </Typography>
                         {/*  */}
 
                         <Typography variant="h6" paragraph>
@@ -270,25 +265,35 @@ export default function MatchesCard() {
                             <GrayLabel variant="inherit">DOB</GrayLabel>
                             {user["birthDate"]}
                           </Typography>
-                          <Typography variant="subtitle2">
-                            <GrayLabel variant="inherit">Height</GrayLabel>
-                            {user["height"]}
-                          </Typography>
-                          <Typography variant="subtitle2">
-                            <GrayLabel variant="inherit">Weight</GrayLabel>
-                            {user["weight"]}
-                          </Typography>
-                          <Typography variant="subtitle2">
-                            <GrayLabel variant="inherit">Eye Color</GrayLabel>
-                            {user["eyeColor"]}
-                          </Typography>
-                          <Typography variant="subtitle2">
-                            <GrayLabel variant="inherit">Hair Color</GrayLabel>
-                            {user["hairColor"]}
-                          </Typography>
-                        </div>
+                          {profile?.height && profile.height.trim() !== "" && (
+                            <Typography variant="subtitle2">
+                              <GrayLabel variant="inherit">Height</GrayLabel>
+                              {profile.height}
+                            </Typography>
+                          )}
 
-                        {/*  */}
+                          {profile?.weight && profile.weight.trim() !== "" && (
+                            <Typography variant="subtitle2">
+                              <GrayLabel variant="inherit">Weight</GrayLabel>
+                              {profile.weight}
+                            </Typography>
+                          )}
+
+                          {profile?.eyeColor && profile.eyeColor.trim() !== "" && (
+                            <Typography variant="subtitle2">
+                              <GrayLabel variant="inherit">Eye Color</GrayLabel>
+                              {profile.eyeColor}
+                            </Typography>
+                          )}
+
+                          {profile?.hairColor && profile.hairColor.trim() !== "" && (
+                            <Typography variant="subtitle2">
+                              <GrayLabel variant="inherit">Hair Color</GrayLabel>
+                              {profile.hairColor}
+                            </Typography>
+                          )}
+
+                        </div>
                       </CardContent>
                     </Collapse>
                   </Card>
@@ -314,8 +319,8 @@ export default function MatchesCard() {
             }}
           >
             <Avatar
-              alt="Remy Sharp"
-              src="https://usrimg.quackquack.co/resize_17132741094Ni9cL1nWqVpgUdMtZ5PflOKw.jpg"
+              alt={profile?.firstName}
+              src={profile?.profileImage}
               sx={{ width: 150, height: 150 }}
             />
           </Box>
@@ -330,82 +335,70 @@ export default function MatchesCard() {
             }}
           >
             <strong>
-              <span style={{ color: "gray" }}> Full Name :</span> Haseena,
-              <span style={{ color: "gray" }}>Age :</span> 27,
-              <span style={{ color: "gray" }}>Place :</span> Malappuram
+              <span style={{ color: "gray" }}> Full Name :</span>
+              {profile?.firstName} {profile?.lastName},
+              <span style={{ color: "gray" }}> Age :</span> {calculateAge(profile?.birthDate)},
+              <span style={{ color: "gray" }}>Place :</span> {profile?.place}
             </strong>
           </Box>
 
-          <h6 style={{ padding: 0, margin: 0, textAlign: "center" }}>
-            Working in Legal Professional
-          </h6>
+          {profile?.profession && <h6 style={{ padding: 0, margin: 0, textAlign: "center" }}>
+            {profile?.profession}
+          </h6>}
 
-          <h6 style={{ padding: 0, margin: 0, textAlign: "center" }}>
-            Studied Higher Secondary / Intermediate
-          </h6>
-          <div
-            style={{
-              padding: 10,
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
-              gap: 8,
-              marginBottom: "10px",
-            }}
-          >
-            <Chip label="Small" size="small" variant="outlined" />
-            <Chip label="Small" size="small" variant="outlined" />
-            <Chip label="Small" size="small" variant="outlined" />
-            <Chip label="Small" size="small" variant="outlined" />
-            <Chip label="Small" size="small" variant="outlined" />
-            <Chip label="Small" size="small" variant="outlined" />
-            <Chip label="Small" size="small" variant="outlined" />
-            <Chip label="Small" size="small" variant="outlined" />
-            <Chip label="Small" size="small" variant="outlined" />
-            <Chip label="Small" size="small" variant="outlined" />
-          </div>
+          {profile?.education && <h6 style={{ padding: 0, margin: 0, textAlign: "center" }}>
+            {profile?.education}
+          </h6>}
+          {profile?.interests && <InterestsComponent interests={profile?.interests} />}
 
-          {/*  */}
 
-          <h4 style={{ padding: 0, margin: 0, textAlign: "center" }}>
-            Dating me is like dating the funniest person you've ever met… and
-            the most humble.
-          </h4>
-
-          {/*  */}
+          {profile?.description && <h4 style={{ padding: 0, margin: 0, textAlign: "center" }}>
+            {profile?.description}
+          </h4>}
 
           <div style={{ display: "flex", justifyContent: "space-evenly" }}>
-            <Typography variant="subtitle2">
+            {profile?.gender && <Typography variant="subtitle2">
               <GrayLabel variant="inherit">Gender</GrayLabel>
-              female
-            </Typography>
-            <Typography variant="subtitle2">
+              {profile?.gender}
+            </Typography>}
+            {profile?.userName && <Typography variant="subtitle2">
               <GrayLabel variant="inherit">Username</GrayLabel>
-              mahroof
-            </Typography>
-            <Typography variant="subtitle2">
+              {profile?.userName}
+            </Typography>}
+            {profile?.birthDate && <Typography variant="subtitle2">
               <GrayLabel variant="inherit">DOB</GrayLabel>
-              12-04-1996
-            </Typography>
-            <Typography variant="subtitle2">
-              <GrayLabel variant="inherit">Height</GrayLabel>
-              5.5
-            </Typography>
-            <Typography variant="subtitle2">
-              <GrayLabel variant="inherit">Weight</GrayLabel>
-              53
-            </Typography>
-            <Typography variant="subtitle2">
-              <GrayLabel variant="inherit">Eye Color</GrayLabel>
-              Blue
-            </Typography>
-            <Typography variant="subtitle2">
-              <GrayLabel variant="inherit">Hair Color</GrayLabel>
-              Black
-            </Typography>
+              {profile?.birthDate}
+            </Typography>}
+            {profile?.height && profile.height.trim() !== "" && (
+              <Typography variant="subtitle2">
+                <GrayLabel variant="inherit">Height</GrayLabel>
+                {profile.height}
+              </Typography>
+            )}
+
+            {profile?.weight && profile.weight.trim() !== "" && (
+              <Typography variant="subtitle2">
+                <GrayLabel variant="inherit">Weight</GrayLabel>
+                {profile.weight}
+              </Typography>
+            )}
+
+            {profile?.eyeColor && profile.eyeColor.trim() !== "" && (
+              <Typography variant="subtitle2">
+                <GrayLabel variant="inherit">Eye Color</GrayLabel>
+                {profile.eyeColor}
+              </Typography>
+            )}
+
+            {profile?.hairColor && profile.hairColor.trim() !== "" && (
+              <Typography variant="subtitle2">
+                <GrayLabel variant="inherit">Hair Color</GrayLabel>
+                {profile.hairColor}
+              </Typography>
+            )}
+
           </div>
 
-          {/*  */}
         </DialogContent>
         <DialogActions>
           <Button

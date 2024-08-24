@@ -37,18 +37,7 @@ export default function ResponsiveMessageBox(props: any) {
     setDisable(true);
     setShowError(false);
   }
-  React.useEffect(() => {
-    // socket.emit("join-room", { room_id: "1" }); // Replace with actual room ID logic
-    socket.on("receive-message", (data:Message) => {
-      console.log("Message received:", data);
-     
-    });
-
-    return () => {
-      socket.off("receive-message");
-      socket.disconnect();
-    };
-  }, [dispatch]);
+  
   function resetStates() {
     setDisable(false);
     setMessage("");

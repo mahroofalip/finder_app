@@ -27,7 +27,7 @@ export const store = configureStore({
     eyeColorOption:eyeColorOptionsAction,
     hairColorOption:hairColorOptionsAction,
     googlePlaces:googleMapPlaceAction,
-    updateUser:updateUserProfile
+    updateUser:updateUserProfile,
   },
 });
 
@@ -57,9 +57,8 @@ export interface Chat {
 
 export interface MessageState {
   messages: any;
-  // messages:Message[]
-  // chat: Chat | null;
-    chat: any | null;
+  selectedMessages:any
+  chat: any | null;
   loading: boolean;
   error: string | null;
 }
@@ -121,6 +120,7 @@ export interface User {
   hairColor:string| null;
   updatedAt:any;
   interests: any| null; 
+  lookingFor: any| null; 
 }
 
 export interface AuthState {
@@ -132,6 +132,7 @@ export interface AuthState {
 export interface UserState {
   users: User[];
   user:User| null;
+  profile:any;
   loading: boolean;
   error: string | null;
 }
