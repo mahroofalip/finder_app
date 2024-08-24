@@ -23,6 +23,9 @@ const messageSlice = createSlice({
         },
         sendMessageSuccess: (state, action: PayloadAction<Message>) => {
             state.loading = false;
+            console.log(state.selectedMessages,"state.selectedMessages 1");
+            console.log(action.payload,"state.selectedMessages 2");
+            
             state.selectedMessages.push(action.payload);
         },
         sendMessageFailure: (state, action: PayloadAction<string>) => {
@@ -100,9 +103,7 @@ export const sendMessage = (newMessage: any,roomId:any) => async (dispatch: AppD
     }
 };
 export const pushReciverNewMessage = (message: any) => async (dispatch: AppDispatch) => {
-  
         dispatch(sendMessageSuccess(message));
-    
 };
 
 export const loadUserChats = () => async (dispatch: AppDispatch) => {
@@ -125,9 +126,6 @@ export const createRoom = (sender_id : any,receiver_id:any,message_content:any) 
     dispatch(createRoomStart());
     try {
         const token = localStorage.getItem('token'); 
-
-       
-
         const response = await axios.post('http://localhost:5000/api/messages/createRoomAndSendMessage', {receiver_id,sender_id,message_content}, {
             headers: {
                 'Content-Type': 'application/json',

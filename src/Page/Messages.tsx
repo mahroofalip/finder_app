@@ -15,6 +15,7 @@ import socket from "../socket.ts/socket";
 import { calculateAge } from "../util";
 import { getTimeAgo } from "../components/TimeFunctions/TimeFunction";
 import { OnlineBadge } from "../components/Badges/Badges";
+import { getMe } from "../action/authActions";
 
 interface User {
   name: {
@@ -32,6 +33,7 @@ interface User {
 const Messages: React.FC = () => {
 
   const chatRooms = useSelector((state: RootState) => state.message.messages);
+  const user = useSelector((state: RootState) => state.auth.user);
 
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
   const dispatch: AppDispatch = useDispatch();
@@ -39,7 +41,10 @@ const Messages: React.FC = () => {
   React.useEffect(() => {
     dispatch(loadUserChats()); // Fetch users from your backend
   }, [dispatch]);
-
+  React.useEffect(() => {
+    const token = localStorage.getItem("token");
+    dispatch(getMe());
+  }, [dispatch]);
 
   React.useEffect(() => {
     socket.on("receive-message", (data: Message) => {
@@ -67,7 +72,8 @@ const Messages: React.FC = () => {
       ) : (
         <List sx={{ width: "100%", bgcolor: "background.paper" }}>
           {chatRooms.map((chat: any, index: any) => (
-            <React.Fragment key={index}>
+            
+             <React.Fragment key={index}>
               <ListItem
                 alignItems="flex-start"
                 sx={{ cursor: "pointer" }}
@@ -77,7 +83,7 @@ const Messages: React.FC = () => {
                   <Avatar alt={""} src={chat?.Receiver?.profileImage} />
                 </ListItemAvatar>
                 <ListItemText
-                  primary={`${chat?.Receiver?.firstName}  ${chat?.Receiver?.lastName}, ${calculateAge(chat?.Receiver?.birthDate)}`}
+                  primary={`${chat?.senderId == user?.id ? chat?.Receiver?.firstName:chat?.Sender?.firstName}  ${chat?.senderId == user?.id ? chat?.Receiver?.lastName:chat?.Sender?.lastName}, ${calculateAge(chat?.Receiver?.birthDate)}`}
                   secondary={
                     <React.Fragment>
                       <div

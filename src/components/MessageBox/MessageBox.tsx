@@ -85,12 +85,12 @@ export default function ResponsiveMessageBox(props: any) {
       >
         <Avatar
           alt="Remy Sharp"
-          src="https://usrimg.quackquack.co/resize_159443301244458938835159.jpg"
+          src={selectedUser?.profileImage}
           sx={{ width: 100, height: 100 }}
         />
       </Box>
       <DialogTitle align="center" id="responsive-dialog-title">
-        {`Send Message to ${me?.user?.firstName + " " + me?.user?.lastName}`}
+        {`Send Message to ${selectedUser?.firstName + " " + selectedUser?.lastName}`}
       </DialogTitle>
       <DialogContent>
         {disable && (

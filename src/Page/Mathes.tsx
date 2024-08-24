@@ -36,6 +36,7 @@ import { intewellToFetch } from "../consts";
 import { getProfile } from "../action/profileAction";
 import { calculateAge } from "../util";
 import InterestsComponent from "../components/Interests/InterestsChip";
+import { getMe } from "../action/authActions";
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -66,7 +67,7 @@ export default function MatchesCard() {
   const users = useSelector((state: RootState) => state.users.users);
   const user = useSelector((state: RootState) => state.auth);
   const { profile, loading, error } = useSelector((state: RootState) => state.updateUser);
-
+  const  getUser = useSelector((state: RootState) => state.auth.user);
 
 
   const [expandedProfiles, setExpandedProfiles] =
@@ -111,15 +112,19 @@ export default function MatchesCard() {
     expandedProfilesCopy[index] = !expandedProfilesCopy[index];
     setExpandedProfiles(expandedProfilesCopy);
   };
-
+  React.useEffect(() => {
+    const token = localStorage.getItem("token");
+    dispatch(getMe());
+  }, [dispatch]);
   return (
     <>
       <Grid container spacing={2}>
         {users.length !== 0 &&
           users?.map((user, index) => {
             const timeAgo = getTimeAgo(user?.updatedAt);
+            //  ? return  
             return (
-              <>
+              user?.id !== getUser?.id && <>
                 <Grid key={`key${index}`} item xs={12} sm={6} md={4} lg={4} xl={3}>
                   <Card sx={{ maxWidth: "100%" }}>
                     <CardHeader
