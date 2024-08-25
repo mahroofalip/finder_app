@@ -17,6 +17,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import ErrorIcon from '@mui/icons-material/Error'; // Import error icon
 import AlertComponent from '../components/Alerts/AlertComponent';
 import { loadIntrestsOptions } from '../action/intrestsOptionsAction';
+import { orangeHeaderBg } from '../consts';
 
 
 const blue = {
@@ -89,8 +90,8 @@ interface Profile {
   profession: string;
   displayName: string;
   description: string;
-  interests: string[]; 
-  lookingFor:string[]; 
+  interests: string[];
+  lookingFor: string[];
   place: string
   profileImageKey: string
 }
@@ -128,8 +129,8 @@ const ProfileForm: React.FC = () => {
     displayName: '',
     description: '',
     place: '',
-    interests:[],
-    lookingFor:[],
+    interests: [],
+    lookingFor: [],
     profileExt: '',
     profileImageKey: ''
   });
@@ -154,10 +155,10 @@ const ProfileForm: React.FC = () => {
         place: authUser.place || '',
         profileExt: '',
         interests: authUser?.interests
-        ? authUser.interests.split(',').map((interest: string) => interest.trim()): [], 
+          ? authUser.interests.split(',').map((interest: string) => interest.trim()) : [],
         profileImageKey: authUser.profileImageKey || "",
-        lookingFor:authUser?.lookingFor
-        ? authUser.lookingFor.split(',').map((gender: string) => gender.trim()): [],
+        lookingFor: authUser?.lookingFor
+          ? authUser.lookingFor.split(',').map((gender: string) => gender.trim()) : [],
       });
     }
   }, [authUser]);
@@ -204,15 +205,15 @@ const ProfileForm: React.FC = () => {
     const { name, value } = e.target;
     setProfile((prevProfile) => ({
       ...prevProfile,
-      [name]: value,  
+      [name]: value,
     }));
     setErrors((prevErrors) => ({
       ...prevErrors,
-      [name]: '',  
+      [name]: '',
     }));
-    validate();  
+    validate();
   };
-  
+
 
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -235,7 +236,7 @@ const ProfileForm: React.FC = () => {
     validate()
   };
 
-  
+
 
   const validate = () => {
 
@@ -312,8 +313,8 @@ const ProfileForm: React.FC = () => {
 
     if (validate()) {
       try {
-      
-        
+
+
         await dispatch(updateUserProfile(profile));
         // Show success alert
         const token = localStorage.getItem("token");
@@ -366,7 +367,7 @@ const ProfileForm: React.FC = () => {
                 }}
                 onClick={handleAvatarClick}
               >
-                <EditIcon />
+                <EditIcon sx={{color:orangeHeaderBg}}/>
               </IconButton>
               <input
                 type="file"
@@ -658,13 +659,13 @@ const ProfileForm: React.FC = () => {
           </Grid>
           <Grid item xs={12} md={6}>
             <label>Looking For</label>
-            
+
             <Autocomplete
               multiple
               id="tags-filled"
               options={genderOptions.map((option) => option.gender)}
-              value={profile.lookingFor} 
-              defaultValue={profile.lookingFor || []} 
+              value={profile.lookingFor}
+              defaultValue={profile.lookingFor || []}
               size='small'
               onChange={(event, newValue) => {
                 handleSearchAndChangeOptions({ target: { name: 'lookingFor', value: newValue } });
@@ -682,7 +683,7 @@ const ProfileForm: React.FC = () => {
                   {...params}
                   variant="outlined"
                   placeholder="Select your lookingFor"
-                  name="lookingFor" 
+                  name="lookingFor"
                 />
               )}
             />
@@ -715,9 +716,9 @@ const ProfileForm: React.FC = () => {
                 <TextField
                   {...params}
                   variant="outlined"
-                  
+
                   placeholder="Select your interests"
-                  name="interests" 
+                  name="interests"
                 />
               )}
             />
@@ -733,7 +734,7 @@ const ProfileForm: React.FC = () => {
               id="description"
               value={profile.description}
               onChange={handleTextareaChange}
-              maxLength={1995} 
+              maxLength={1995}
             />
             {errors.description && (
               <Typography color="error" variant="body2">
@@ -750,7 +751,21 @@ const ProfileForm: React.FC = () => {
               />
             )}
 
-            <Button sx={{ mt: 2 }} type="submit" fullWidth variant="contained" color="primary">
+            <Button
+              sx={{
+                mt: 2,
+                backgroundColor: orangeHeaderBg, // Background color
+                color: 'white', // Text color
+                borderColor: orangeHeaderBg, // Border color (if needed, though contained buttons usually don't show borders)
+                '&:hover': {
+                  backgroundColor: 'darkorange', // Background color on hover
+                  color: 'white', // Text color on hover
+                },
+              }}
+              type="submit"
+              fullWidth
+              variant="contained"
+            >
               Submit
             </Button>
           </Grid>

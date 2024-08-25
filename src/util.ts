@@ -32,3 +32,18 @@ export default function detectUrlType(url:any) {
   
     return age;
   };
+
+
+
+  //////////
+
+
+  export const isRecentlyUpdated = (timestamp: any): boolean => {
+    const now = new Date();
+    const updatedAt = new Date(timestamp);
+    const oneMinute = 60 * 1000; // 1 minute in milliseconds
+    return (now.getTime() - updatedAt.getTime()) < oneMinute;
+  };
+  
+  // Helper function to format time ago (you can use your existing implementation)
+  

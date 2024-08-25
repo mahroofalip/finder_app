@@ -3,22 +3,23 @@ import {
 } from "@mui/material";
 
 import MatchesCard from "./Mathes";
-import { backgroundNav } from "../consts";
+import { backgroundNav, orangeHeaderBg } from "../consts";
 
 export default function Visitors() {
  
   return (
     <>
         <Box>
-          <div
-            style={{
-              display: "flex",
-              background: backgroundNav,
-              color: "orange",
-            }}
-          >
-            Visitors For You
-          </div>
+        <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                background: orangeHeaderBg,
+                color: "white",
+              }}
+            >
+              Visitors For You
+            </div>
           <MatchesCard />
         </Box>
       

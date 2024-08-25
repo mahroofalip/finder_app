@@ -110,11 +110,12 @@ function App(props: Props) {
     dispatch(registerUser(userData));
   };
 
-  const handleLoginSubmit = (data: { email: string; password: string }) => {
-    const { password, email } = data;
+  const handleLoginSubmit = (data: { email: string; password: string; rememberMe:boolean }) => {
+    const { password, email,rememberMe } = data;
     const userData: any = {
       password,
       email,
+      rememberMe
     };
 
 

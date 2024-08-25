@@ -3,6 +3,7 @@ import {
   } from "@mui/material";
   
   import MatchesCard from "./Mathes";
+import { orangeHeaderBg } from "../consts";
   
   export default function Ignored() {
    
@@ -14,7 +15,7 @@ import {
               style={{
                 display: "flex",
                 justifyContent: "center",
-                background: "green",
+                background: orangeHeaderBg,
                 color: "white",
               }}
             >

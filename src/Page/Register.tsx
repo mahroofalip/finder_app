@@ -12,6 +12,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import ButtonWithLoader from "../ButtonWithLoader";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
+import { orangeHeaderBg } from "../consts";
 
 function Copyright(props: any) {
   return (
@@ -43,9 +44,9 @@ interface RegisterProps {
 }
 
 const defaultTheme = createTheme();
+
 const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
-  const  {user,loading}= useSelector((state: RootState) => state.auth);
-  // const  state = useSelector((state: RootState) => state);
+  const { user, loading } = useSelector((state: RootState) => state.auth);
 
   const [formErrors, setFormErrors] = React.useState({
     firstName: "",
@@ -67,12 +68,6 @@ const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(String(email).toLowerCase());
   };
-
-  // const validatePassword = (password: string) => {
-  //   const re =
-  //     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-  //   return re.test(password);
-  // };
 
   const validateForm = (data: any) => {
     let errors = { ...formErrors };
@@ -103,8 +98,6 @@ const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
     // Validate password
     if (!data.password) {
       errors.password = "Password is required";
-
-    
     } else {
       errors.password = "";
     }
@@ -132,9 +125,11 @@ const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
       password: formData.get("password") as string,
       phone: formData.get("phone") as string,
     };
+
     const errors = validateForm(data);
     setFormErrors(errors);
     const hasErrors = Object.values(errors).some((error) => error !== "");
+
     if (!hasErrors && signUpSubmit) {
       signUpSubmit({
         firstName: data.firstName,
@@ -144,6 +139,7 @@ const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
         password: data.password,
       });
     }
+
     setTouched({
       firstName: true,
       lastName: true,
@@ -182,15 +178,18 @@ const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
             alignItems: "center",
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+          <Avatar sx={{ m: 1, bgcolor: orangeHeaderBg }}>
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
 
-
-            {user?.status === "exist" ?  <small className="red-text"> {user?.message} </small>: "" }
+          {user?.status === "exist" ? (
+            <small className="red-text">{user?.message}</small>
+          ) : (
+            ""
+          )}
 
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
@@ -301,7 +300,18 @@ const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
               fullWidth={true}
               variant="contained"
               type="submit"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{
+                mt: 3,
+                mb: 2,
+                backgroundColor: orangeHeaderBg, // Background color
+                color: "white", // Text color
+                borderColor: orangeHeaderBg, // Border color (if applicable)
+                "&:hover": {
+                  backgroundColor: "darkorange", // Background color on hover
+                  borderColor: "darkorange", // Border color on hover (if applicable)
+                  color: "white", // Text color on hover
+                },
+              }}
             >
               Sign Up
             </ButtonWithLoader>
@@ -313,7 +323,7 @@ const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
                 sx={{
                   cursor: "pointer",
                   textDecoration: "underline",
-                  color: "primary.main",
+                  "&:hover": { color: orangeHeaderBg },
                 }}
               >
                 Already have an account? Sign in

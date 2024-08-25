@@ -32,7 +32,7 @@ import { AppDispatch, RootState } from "../store";
 import { useSelector } from "react-redux";
 import { OnlineBadge } from "../components/Badges/Badges";
 import { getTimeAgo } from "../components/TimeFunctions/TimeFunction";
-import { intewellToFetch } from "../consts";
+import { intewellToFetch, orangeHeaderBg } from "../consts";
 import { getProfile } from "../action/profileAction";
 import { calculateAge } from "../util";
 import InterestsComponent from "../components/Interests/InterestsChip";
@@ -67,7 +67,7 @@ export default function MatchesCard() {
   const users = useSelector((state: RootState) => state.users.users);
   const user = useSelector((state: RootState) => state.auth);
   const { profile, loading, error } = useSelector((state: RootState) => state.updateUser);
-  const  getUser = useSelector((state: RootState) => state.auth.user);
+  const getUser = useSelector((state: RootState) => state.auth.user);
 
 
   const [expandedProfiles, setExpandedProfiles] =
@@ -191,20 +191,20 @@ export default function MatchesCard() {
                         aria-label="send message"
                         onClick={() => handleClickOpenMessage(user)}
                       >
-                        <MessageOutlinedIcon sx={{ color: "#4287f5" }} />
+                        <MessageOutlinedIcon sx={{ color: orangeHeaderBg }} />
                       </IconButton>
                       <IconButton
                         onClick={handleLike}
                         aria-label="add to favorites"
                       >
                         {!like ? (
-                          <FavoriteBorderOutlinedIcon />
+                          <FavoriteBorderOutlinedIcon sx={{ color: orangeHeaderBg }} />
                         ) : (
                           <FavoriteOutlinedIcon sx={{ color: "red" }} />
                         )}
                       </IconButton>
                       <IconButton aria-label="share">
-                        <CancelIcon sx={{ color: "black" }} />
+                        <CancelIcon sx={{ color: orangeHeaderBg }} />
                       </IconButton>
                       {/* {!matches &&} */}
 
@@ -225,7 +225,7 @@ export default function MatchesCard() {
                             }}
                             aria-label="info"
                           >
-                            <InfoIcon sx={{ color: "#4287f5" }} />
+                            <InfoIcon sx={{ color: orangeHeaderBg }} />
                           </IconButton>
                         </div>
                       )}
@@ -408,11 +408,21 @@ export default function MatchesCard() {
         <DialogActions>
           <Button
             variant="outlined"
-            sx={{ borderColor: "gray", color: "gray" }}
+            sx={{
+              borderColor: orangeHeaderBg,
+              color: orangeHeaderBg,
+              // Background color
+              '&:hover': {
+                backgroundColor: orangeHeaderBg, // Background color on hover
+                color: 'white', // Text color on hover (to maintain contrast)
+                borderColor: orangeHeaderBg, // Border color on hover
+              },
+            }}
             onClick={handleClose}
           >
             Close
           </Button>
+
         </DialogActions>
       </Dialog>
       <ResponsiveMessageBox

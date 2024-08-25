@@ -14,54 +14,69 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import ButtonWithLoader from '../ButtonWithLoader';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
+import { orangeHeaderBg } from '../consts';
 
 function Copyright(props: any) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
       <Link color="inherit" href="#">
-       www.finder.com
+        www.finder.com
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
     </Typography>
   );
 }
+
 interface LoginProps {
   showRegisterPage: () => void;
-  loginSubmit: (data: { 
+  loginSubmit: (data: {
     email: string;
     password: string;
+    rememberMe: boolean;
   }) => void;
-
 }
 
-// TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
-const Login:React.FC<LoginProps> = ({ showRegisterPage,loginSubmit }) => {
 
-
+const Login: React.FC<LoginProps> = ({ showRegisterPage, loginSubmit }) => {
   const auth = useSelector((state: RootState) => state.auth);
-  
+  const [isSubmit, setIsSubmit] = React.useState(false);
+  const [errors, setErrors] = React.useState({
+    email: '',
+    password: '',
+  });
+
+  const validateEmail = (email: string) => {
+    const re = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+    return re.test(String(email).toLowerCase());
+  };
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     const formData = new FormData(event.currentTarget);
-    const data = {
-      email: formData.get("email") as string,
-      password: formData.get("password") as string,
-    };
-    // validateForm(data)
-    // const errors = null;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const rememberMe = formData.get("remember") ? true : false;
 
-    // setFormErrors(errors);
-    // const hasErrors = Object.values(errors).some((error) => error !== "");
-    // const hasErrors = false;
-    if (loginSubmit) {
-      loginSubmit({
-        email:data.email,
-        password: data.password,
-       });
+    let formErrors = { email: '', password: '' };
+
+    if (!email) {
+      formErrors.email = 'Email is required';
+    } else if (!validateEmail(email)) {
+      formErrors.email = 'Invalid email address';
+    }
+
+    if (!password) {
+      formErrors.password = 'Password is required';
+    }
+
+    setErrors(formErrors);
+
+    if (!formErrors.email && !formErrors.password) {
+      setIsSubmit(true);
+      loginSubmit({ email, password, rememberMe });
     }
   };
 
@@ -77,12 +92,20 @@ const Login:React.FC<LoginProps> = ({ showRegisterPage,loginSubmit }) => {
             alignItems: 'center',
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+          <Avatar sx={{ m: 1, bgcolor: orangeHeaderBg}}>
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
+
+          {/* Conditionally Render Error Message */}
+          {auth.error && isSubmit && (
+            <Typography color="error" sx={{ mt: 2 }}>
+              Authentication failed. Please check your email and password.
+            </Typography>
+          )}
+
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
               margin="normal"
@@ -93,6 +116,8 @@ const Login:React.FC<LoginProps> = ({ showRegisterPage,loginSubmit }) => {
               name="email"
               autoComplete="email"
               autoFocus
+              error={Boolean(errors.email)}
+              helperText={errors.email}
               InputLabelProps={{
                 sx: {
                   '& .MuiInputLabel-asterisk': {
@@ -110,6 +135,8 @@ const Login:React.FC<LoginProps> = ({ showRegisterPage,loginSubmit }) => {
               type="password"
               id="password"
               autoComplete="current-password"
+              error={Boolean(errors.password)}
+              helperText={errors.password}
               InputLabelProps={{
                 sx: {
                   '& .MuiInputLabel-asterisk': {
@@ -119,33 +146,63 @@ const Login:React.FC<LoginProps> = ({ showRegisterPage,loginSubmit }) => {
               }}
             />
             <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
+              control={<Checkbox value="remember" color="primary" sx={{
+                color: orangeHeaderBg,
+                '&.Mui-checked': {
+                  color: orangeHeaderBg,
+                },
+              }}/>}
               label="Remember me"
+              name="remember"
             />
-              <ButtonWithLoader
+            <ButtonWithLoader
               loading={auth.loading}
               fullWidth={true}
               variant="contained"
               type="submit"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{
+                mt: 3,
+                mb: 2,
+                backgroundColor: orangeHeaderBg,
+                color: 'white',
+                borderColor: orangeHeaderBg,
+                '&:hover': {
+                  backgroundColor: 'darkorange',
+                  borderColor: 'darkorange',
+                  color: 'white',
+                },
+              }}
             >
               Sign In
             </ButtonWithLoader>
-            
             <Grid container>
               <Grid item xs>
-                <Link href="#" variant="body2">
+                <Link href="#" variant="body2" sx={{
+                  color: orangeHeaderBg,
+                  textDecoration: 'underline',
+                  '&:hover': {
+                    color: orangeHeaderBg,
+                    textDecorationColor: orangeHeaderBg,
+                  }
+                }}>
                   Forgot password?
                 </Link>
               </Grid>
               <Grid item>
-              <Typography
-            variant="body2"
-            onClick={showRegisterPage}
-            sx={{ cursor: 'pointer', textDecoration: 'underline', color: 'primary.main' }}
-          >
-            Don't have an account? Sign Up
-          </Typography>
+                <Typography
+                  variant="body2"
+                  onClick={showRegisterPage}
+                  sx={{
+                    color: orangeHeaderBg,
+                    textDecoration: 'underline',
+                    '&:hover': {
+                      color: orangeHeaderBg,
+                      textDecorationColor: orangeHeaderBg,
+                    }
+                  }}
+                >
+                  Don't have an account? Sign Up
+                </Typography>
               </Grid>
             </Grid>
           </Box>

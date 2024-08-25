@@ -21,11 +21,13 @@ import { calculateAge } from "../util";
 import { getTimeAgo } from "../components/TimeFunctions/TimeFunction";
 import { OnlineBadge } from "../components/Badges/Badges";
 import { getMe } from "../action/authActions";
+import Subheader from "../components/subHeaderChat/SubHeader";
+import { orangeHeaderBg } from "../consts";
 
 export default function ChatPage(props: any) {
   const dispatch: AppDispatch = useDispatch();
 
-  const selectedMessages = useSelector((state: RootState) => state.message.selectedMessages);
+  const selectedMessages = useSelector((state: RootState) => state?.message?.selectedMessages);
   const [newMessage, setNewMessage] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [chatHeight, setChatHeight] = useState<number>(
@@ -45,8 +47,19 @@ export default function ChatPage(props: any) {
     const handleReceiveMessage = (data: any) => {
       dispatch(pushReciverNewMessage(data));
     };
+  
     socket.on("receive-message", handleReceiveMessage);
-  }, []);
+  
+    socket.on("disconnect", () => {
+      socket.connect();
+    });
+  
+    // Cleanup on unmount
+    return () => {
+      socket.off("receive-message", handleReceiveMessage);
+    };
+  }, [dispatch]);
+  
 
   const submitMessage = () => {
     if (newMessage.trim() !== "") {
@@ -103,6 +116,7 @@ export default function ChatPage(props: any) {
 
   return (
     <Box style={{ border: "1px solid #ded9d9", borderRadius: "5px" }}>
+      
       <div>
         <CardHeader
           sx={{ backgroundColor: "#f2f7f4" }}
@@ -122,28 +136,22 @@ export default function ChatPage(props: any) {
               >
                 <Avatar
                   aria-label="recipe"
-                  src={"https://randomuser.me/api/portraits/thumb/men/40.jpg"}
+                  src={props?.messageRoom?.senderId == user?.id ? props?.messageRoom?.Receiver.profileImage : props?.messageRoom?.Sender.profileImage}
                 />
               </Badge>
             </>
           }
-          // primary={`${chat?.senderId == user?.id ? chat?.Receiver?.firstName:chat?.Sender?.firstName}  ${chat?.senderId == user?.id ? chat?.Receiver?.lastName:chat?.Sender?.lastName}, ${calculateAge(chat?.Receiver?.birthDate)}`}
 
           title={
             <Typography variant="body1" color={"black"}>
-              {props?.messageRoom?.senderId  == user?.id ?  props?.messageRoom?.Receiver.firstName:props?.messageRoom?.Sender.firstName} &nbsp;
-              {props?.messageRoom?.senderId  == user?.id ?  props?.messageRoom?.Receiver.lastName:props?.messageRoom?.Sender.lastName},
-              {calculateAge(props?.messageRoom?.senderId  == user?.id ? props?.messageRoom?.Receiver?.birthDate:props?.messageRoom?.Sender?.birthDate)},&nbsp;
-              {props?.messageRoom?.senderId  == user?.id ? props?.messageRoom?.Receiver.place:props?.messageRoom?.Sender.place}
+              {props?.messageRoom?.senderId == user?.id ? props?.messageRoom?.Receiver.firstName : props?.messageRoom?.Sender.firstName} &nbsp;
+              {props?.messageRoom?.senderId == user?.id ? props?.messageRoom?.Receiver.lastName : props?.messageRoom?.Sender.lastName},
+              {calculateAge(props?.messageRoom?.senderId == user?.id ? props?.messageRoom?.Receiver?.birthDate : props?.messageRoom?.Sender?.birthDate)},&nbsp;
+              {props?.messageRoom?.senderId == user?.id ? props?.messageRoom?.Receiver.place : props?.messageRoom?.Sender.place}
             </Typography>
           }
           subheader={
-            <Typography>
-              {props?.messageRoom?.Receiver?.isOnline
-                ? "Online"
-                : getTimeAgo(props?.messageRoom?.Receiver?.updatedAt)}
-              <OnlineBadge />
-            </Typography>
+            <Subheader messageRoom={props?.messageRoom} user={user} />
           }
         />
       </div>
@@ -223,7 +231,7 @@ export default function ChatPage(props: any) {
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton aria-label="send message" onClick={submitMessage}>
-                  <SendIcon sx={{ color: "#03befc" }} />
+                  <SendIcon sx={{ color: orangeHeaderBg }} />
                 </IconButton>
               </InputAdornment>
             ),

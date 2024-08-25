@@ -23,9 +23,6 @@ const messageSlice = createSlice({
         },
         sendMessageSuccess: (state, action: PayloadAction<Message>) => {
             state.loading = false;
-            console.log(state.selectedMessages,"state.selectedMessages 1");
-            console.log(action.payload,"state.selectedMessages 2");
-            
             state.selectedMessages.push(action.payload);
         },
         sendMessageFailure: (state, action: PayloadAction<string>) => {

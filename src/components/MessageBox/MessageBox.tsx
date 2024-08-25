@@ -20,7 +20,7 @@ import { getMe } from "../../action/authActions";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { createRoom } from "../../action/messageActions";
-import socket from "../../socket.ts/socket";
+import { orangeHeaderBg } from "../../consts";
 
 export default function ResponsiveMessageBox(props: any) {
   const { open, handleClose, selectedUser } = props;
@@ -119,7 +119,8 @@ export default function ResponsiveMessageBox(props: any) {
                     onClick={submitMessage}
                     aria-label="toggle password visibility"
                   >
-                    <SendIcon sx={{ color: "#03befc" }} />
+                  
+                    <SendIcon sx={{ color: orangeHeaderBg}} />
                   </IconButton>
                 </InputAdornment>
               ),
@@ -129,6 +130,16 @@ export default function ResponsiveMessageBox(props: any) {
         {disable && (
           <Button
             fullWidth
+            sx={{
+              mt: 2,
+              backgroundColor: orangeHeaderBg, 
+              color: 'white', 
+              borderColor: orangeHeaderBg, 
+              '&:hover': {
+                backgroundColor: 'darkorange',
+                color: 'white',
+              },
+            }}
             variant="contained"
             onClick={() => {
               resetStates();
