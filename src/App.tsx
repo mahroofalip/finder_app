@@ -110,8 +110,8 @@ function App(props: Props) {
     dispatch(registerUser(userData));
   };
 
-  const handleLoginSubmit = (data: { email: string; password: string; rememberMe:boolean }) => {
-    const { password, email,rememberMe } = data;
+  const handleLoginSubmit = (data: { email: string; password: string; rememberMe: boolean }) => {
+    const { password, email, rememberMe } = data;
     const userData: any = {
       password,
       email,
@@ -218,6 +218,8 @@ function App(props: Props) {
                 {index === 7 && <ThumbDownOffAltIcon sx={{ color: "orange" }} />}
                 {index === 8 && <BlockOutlinedIcon sx={{ color: "orange" }} />}
                 {index === 9 && <LoginIcon sx={{ color: "orange" }} />}
+             
+
               </ListItemIcon>
               <ListItemText primary={text} />
             </ListItemButton>
@@ -249,9 +251,10 @@ function App(props: Props) {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: "none" } }}
+            sx={{ mr: 2,display: { sm: "none" } }}
+          
           >
-            <MenuIcon />
+            <MenuIcon sx={{color:'black'}} />
           </IconButton>
           <Typography variant="h6" noWrap sx={{ color: "orange" }} component="div">
             {selectedMenuItem}
@@ -298,16 +301,16 @@ function App(props: Props) {
           open
         >
           <Toolbar sx={{ background: backgroundNav }}>
-            
-              <Avatar
-                alt={`${me?.user?.firstName} ${me?.user?.lastName}`}
-                src={me?.user?.profileImage || ""} />
-              <FavoriteBorderIcon sx={{ fontWeight: "bold", marginLeft: "20px", color: "orange" }} />
-              <Typography
-                sx={{ fontWeight: "bold", marginLeft: "5px", color: "orange" }}
-              >
-                {"Finder"}
-              </Typography>
+
+            <Avatar
+              alt={`${me?.user?.firstName} ${me?.user?.lastName}`}
+              src={me?.user?.profileImage || "https://pics.craiyon.com/2023-11-26/oMNPpACzTtO5OVERUZwh3Q.webp"} />
+            <FavoriteBorderIcon sx={{ fontWeight: "bold", marginLeft: "20px", color: "orange" }} />
+            <Typography
+              sx={{ fontWeight: "bold", marginLeft: "5px", color: "orange" }}
+            >
+              {"Finder"}
+            </Typography>
 
 
 

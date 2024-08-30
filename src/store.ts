@@ -10,7 +10,7 @@ import hairColorOptionsAction from './action/hairColorAction';
 import googleMapPlaceAction from './action/googleMapPlaceAction';
 import updateUserProfile  from './action/profileAction';
 import intrestsOptionsAction from './action/intrestsOptionsAction';
-
+import likeAction from './action/likeActions'
 
 
 
@@ -28,6 +28,7 @@ export const store = configureStore({
     hairColorOption:hairColorOptionsAction,
     googlePlaces:googleMapPlaceAction,
     updateUser:updateUserProfile,
+    like:likeAction
   },
 });
 
@@ -133,6 +134,15 @@ export interface UserState {
   users: User[];
   user:User| null;
   profile:any;
+  loading: boolean;
+  error: string | null;
+}
+
+export interface likeState {
+  like:User | null,
+  likes:User[] | null,
+  cancel:User | null,
+  cancelledUsers:User[] | null,
   loading: boolean;
   error: string | null;
 }

@@ -28,7 +28,7 @@ import DialogContent from "@mui/material/DialogContent";
 import ResponsiveMessageBox from "../components/MessageBox/MessageBox";
 import { loadFinderUsers } from "../action/usersAction";
 import { useDispatch } from "react-redux";
-import { AppDispatch, RootState } from "../store";
+import { AppDispatch, RootState, User } from "../store";
 import { useSelector } from "react-redux";
 import { OnlineBadge } from "../components/Badges/Badges";
 import { getTimeAgo } from "../components/TimeFunctions/TimeFunction";
@@ -37,6 +37,7 @@ import { getProfile } from "../action/profileAction";
 import { calculateAge } from "../util";
 import InterestsComponent from "../components/Interests/InterestsChip";
 import { getMe } from "../action/authActions";
+import { addLike, ignoreUser } from "../action/likeActions";
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -77,8 +78,14 @@ export default function MatchesCard() {
   const [open, setOpen] = React.useState(false);
   const [like, setLike] = React.useState(false);
   const [selectedUser, setSelectedUser] = React.useState(null);
-  const handleLike = () => {
-    setLike(!like);
+  const handleLike = (user:User) => {  
+    
+    dispatch(addLike({profileId:user.id}));
+    // setLike(!like);
+  };
+  const handleCancelClick = (user:User) => {
+    dispatch(ignoreUser({profileId:user.id}));
+    // setLike(!like);
   };
   const handleClickOpenMessage = (user: any) => {
     setSelectedUser(user)
@@ -193,8 +200,8 @@ export default function MatchesCard() {
                       >
                         <MessageOutlinedIcon sx={{ color: orangeHeaderBg }} />
                       </IconButton>
-                      <IconButton
-                        onClick={handleLike}
+                      <IconButton 
+                       onClick={()=>handleLike(user)}
                         aria-label="add to favorites"
                       >
                         {!like ? (
@@ -203,7 +210,7 @@ export default function MatchesCard() {
                           <FavoriteOutlinedIcon sx={{ color: "red" }} />
                         )}
                       </IconButton>
-                      <IconButton aria-label="share">
+                      <IconButton aria-label="share" onClick={()=>handleCancelClick(user)}>
                         <CancelIcon sx={{ color: orangeHeaderBg }} />
                       </IconButton>
                       {/* {!matches &&} */}
@@ -411,11 +418,10 @@ export default function MatchesCard() {
             sx={{
               borderColor: orangeHeaderBg,
               color: orangeHeaderBg,
-              // Background color
               '&:hover': {
-                backgroundColor: orangeHeaderBg, // Background color on hover
-                color: 'white', // Text color on hover (to maintain contrast)
-                borderColor: orangeHeaderBg, // Border color on hover
+                backgroundColor: orangeHeaderBg, 
+                color: 'white', 
+                borderColor: orangeHeaderBg, 
               },
             }}
             onClick={handleClose}
