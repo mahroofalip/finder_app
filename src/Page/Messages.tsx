@@ -16,6 +16,8 @@ import { calculateAge } from "../util";
 import { getTimeAgo } from "../components/TimeFunctions/TimeFunction";
 import { OnlineBadge } from "../components/Badges/Badges";
 import { getMe } from "../action/authActions";
+import { intewellToFetch } from "../consts";
+import { updateUserOnlineStatus } from "../action/usersAction";
 
 interface User {
   name: {
@@ -51,10 +53,10 @@ const Messages: React.FC = () => {
       dispatch(loadUserChats()); // Fetch users from your backend
     });
 
-    return () => {
-      socket.off("receive-message");
-      socket.disconnect();
-    };
+    // return () => {
+    //   socket.off("receive-message");
+    //   socket.disconnect();
+    // };
   }, [dispatch]);
 
   const handleUserClick = (user: User) => {
@@ -64,6 +66,15 @@ const Messages: React.FC = () => {
     setSelectedUser(null)
     dispatch(loadUserChats());
   };
+  
+  React.useEffect(() => {
+    const intervalId = setInterval(() => {
+      dispatch(loadUserChats());
+      dispatch(updateUserOnlineStatus());
+    }, intewellToFetch);
+
+    return () => clearInterval(intervalId);
+  }, [dispatch, user, intewellToFetch]);
 
   return (
     <>
@@ -72,8 +83,8 @@ const Messages: React.FC = () => {
       ) : (
         <List sx={{ width: "100%", bgcolor: "background.paper" }}>
           {chatRooms.map((chat: any, index: any) => (
-            
-             <React.Fragment key={index}>
+
+            <React.Fragment key={index}>
               <ListItem
                 alignItems="flex-start"
                 sx={{ cursor: "pointer" }}
@@ -83,7 +94,7 @@ const Messages: React.FC = () => {
                   <Avatar alt={""} src={chat?.Receiver?.profileImage} />
                 </ListItemAvatar>
                 <ListItemText
-                  primary={`${chat?.senderId == user?.id ? chat?.Receiver?.firstName:chat?.Sender?.firstName}  ${chat?.senderId == user?.id ? chat?.Receiver?.lastName:chat?.Sender?.lastName}, ${calculateAge(chat?.Receiver?.birthDate)}`}
+                  primary={`${chat?.senderId == user?.id ? chat?.Receiver?.firstName : chat?.Sender?.firstName}  ${chat?.senderId == user?.id ? chat?.Receiver?.lastName : chat?.Sender?.lastName}, ${calculateAge(chat?.Receiver?.birthDate)}`}
                   secondary={
                     <React.Fragment>
                       <div
@@ -98,7 +109,7 @@ const Messages: React.FC = () => {
                           variant="body2"
                           color="gray"
                         >
-                          You: {chat?.last_message_content} 
+                          You: {chat?.last_message_content}
                         </Typography>
                         <Typography
                           sx={{ display: "inline" }}
@@ -106,8 +117,30 @@ const Messages: React.FC = () => {
                           variant="body2"
                           color="gray"
                         >
-                        {chat?.isOnline ? "Online" : getTimeAgo(chat?.Receiver?.updatedAt)} <OnlineBadge />  
-                          </Typography>
+                          {
+                            chat?.Receiver?.id !== user?.id
+                              ? chat?.Receiver?.isOnline
+                                ? (
+                                  <>
+                                    Online <OnlineBadge />
+                                  </>
+                                )
+                                : (
+                                  getTimeAgo(chat?.Receiver?.lastActiveAt)
+                                )
+                              : chat?.Sender?.isOnline
+                                ? (
+                                  <>
+                                    Online <OnlineBadge />
+                                  </>
+                                )
+                                : (
+                                  getTimeAgo(chat?.Sender?.lastActiveAt)
+                                )
+                          }
+
+                        </Typography>
+
                       </div>
                     </React.Fragment>
                   }

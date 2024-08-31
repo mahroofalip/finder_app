@@ -2,7 +2,9 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { AppDispatch, Chat, Message, MessageState } from '../store';
+import { AppDispatch, Chat, Message, MessageState, RootState } from '../store';
+import { useSelector } from 'react-redux';
+import socket from '../socket.ts/socket';
 
 
 const initialState: MessageState = {
@@ -17,12 +19,33 @@ const messageSlice = createSlice({
     name: 'message',
     initialState,
     reducers: {
-        sendMessageStart: (state) => {
-            state.loading = true;
-            state.error = null;
+        sendMessageStart: (state, action: PayloadAction<{ newMessage: string, userId: string }>) => {
+            socket.connect();
+            // const { newMessage, userId } = action.payload;
+            // const msg = {
+            //     createdAt: new Date(),
+            //     message_content: newMessage,
+            //     senderId: userId,
+            // };
+        
+            // // Check for duplicates based on message content and timestamp (including milliseconds)
+            // const isDuplicate = state.selectedMessages.some((existingMsg: { message_content: string; senderId: string; createdAt: { getTime: () => number; }; }) => 
+            //     existingMsg.message_content === msg.message_content &&
+            //     existingMsg.senderId === msg.senderId &&
+            //     existingMsg.createdAt.getTime() === msg.createdAt.getTime()
+            // );
+        
+            // if (!isDuplicate) {
+                state.loading = true;
+                state.error = null;
+            //     state.selectedMessages.push(msg);
+            // } else {
+            //     console.log('Duplicate message detected, not adding to list.');
+            // }
         },
-        sendMessageSuccess: (state, action: PayloadAction<Message>) => {
+        sendMessageSuccess: (state, action: PayloadAction<any>) => {
             state.loading = false;
+            console.log(action);
             state.selectedMessages.push(action.payload);
         },
         sendMessageFailure: (state, action: PayloadAction<string>) => {
@@ -83,9 +106,10 @@ export const {
     createRoomFailure
 } = messageSlice.actions;
 
-export const sendMessage = (newMessage: any,roomId:any) => async (dispatch: AppDispatch) => {
-    dispatch(sendMessageStart());
+export const sendMessage = (newMessage: any,roomId:any,userId:any) => async (dispatch: AppDispatch) => {
+    dispatch(sendMessageStart({ newMessage, userId }));
     try {
+
         const token = localStorage.getItem('token'); // Retrieve the token from local storage
         const response = await axios.post('http://localhost:5000/api/messages/createNewMessage', {newMessage,roomId}, {
             headers: {
@@ -93,7 +117,6 @@ export const sendMessage = (newMessage: any,roomId:any) => async (dispatch: AppD
                 'Authorization': `Bearer ${token}` // Include the token in the Authorization header
             },
         });
-        
         // dispatch(sendMessageSuccess(response.data.message));
     } catch (error: any) {
         dispatch(sendMessageFailure(error.message));

@@ -45,7 +45,7 @@ import { backgroundNav, intewellToFetch } from "./consts";
 import { updateUserOnlineStatus } from "./action/usersAction";
 
 const drawerWidth = 240;
-
+// socket.connect();
 interface Props {
   window?: () => Window;
 }

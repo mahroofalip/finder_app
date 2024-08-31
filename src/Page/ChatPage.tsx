@@ -45,25 +45,29 @@ export default function ChatPage(props: any) {
   // Listen for incoming messages
   useEffect(() => {
     const handleReceiveMessage = (data: any) => {
-      dispatch(pushReciverNewMessage(data));
+      console.log(data?.senderId != user?.id, "datadatadatadata b");
+      // if (data?.sender_Id != user?.id) {
+        dispatch(pushReciverNewMessage(data));
+      // }
     };
-  
+
     socket.on("receive-message", handleReceiveMessage);
-  
-    socket.on("disconnect", () => {
-      socket.connect();
-    });
-  
-    // Cleanup on unmount
-    return () => {
-      socket.off("receive-message", handleReceiveMessage);
-    };
+
+    // socket.on("disconnect", () => {
+    //   socket.connect();
+    // });
+
+    // // Cleanup on unmount
+    // return () => {
+    //   socket.off("receive-message", handleReceiveMessage);
+    // };
   }, [dispatch]);
-  
+
 
   const submitMessage = () => {
     if (newMessage.trim() !== "") {
-      dispatch(sendMessage(newMessage, props.messageRoom.id));
+      socket.connect();
+      dispatch(sendMessage(newMessage, props.messageRoom.id, user?.id));
       setNewMessage("");
     }
   };
@@ -97,26 +101,33 @@ export default function ChatPage(props: any) {
     };
   }, []);
 
-  const formatMessageDate = (date: Date) => {
-    if (isToday(date)) {
+  const formatMessageDate = (date: Date | string) => {
+    const validDate = new Date(date);
+    if (isNaN(validDate.getTime())) {
+      // Return a default or error message if date is invalid
+      return 'Invalid date';
+    }
+
+    if (isToday(validDate)) {
       return 'Today';
-    } else if (isYesterday(date)) {
+    } else if (isYesterday(validDate)) {
       return 'Yesterday';
     } else {
-      const daysAgo = differenceInDays(new Date(), date);
+      const daysAgo = differenceInDays(new Date(), validDate);
       if (daysAgo < 7) {
-        return format(date, 'EEEE'); // Day name (e.g., Wednesday)
+        return format(validDate, 'EEEE'); // Day name (e.g., Wednesday)
       } else {
-        return format(date, 'MMM dd'); // Date (e.g., Aug 24)
+        return format(validDate, 'MMM dd'); // Date (e.g., Aug 24)
       }
     }
   };
+
 
   let lastMessageDate: string | null = null;
 
   return (
     <Box style={{ border: "1px solid #ded9d9", borderRadius: "5px" }}>
-      
+
       <div>
         <CardHeader
           sx={{ backgroundColor: "#f2f7f4" }}
@@ -177,12 +188,11 @@ export default function ChatPage(props: any) {
             msOverflowStyle: "none",
           }}
         >
-          {selectedMessages.map((msg: any, index: any) => {
-            const messageDate = new Date(msg.createdAt);
+          {selectedMessages?.map((msg: any, index: any) => {
+            const messageDate = new Date(msg.createdAt || Date.now()); // Use current date as fallback
             const currentDate = formatMessageDate(messageDate);
             const showDateLabel = currentDate !== lastMessageDate;
-
-            lastMessageDate = currentDate;
+            lastMessageDate = currentDate || null;
 
             return (
               <React.Fragment key={index}>
