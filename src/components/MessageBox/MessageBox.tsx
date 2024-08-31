@@ -100,7 +100,7 @@ export default function ResponsiveMessageBox(props: any) {
             color={"green"}
             gutterBottom
           >
-            Message Sent
+            Message Sent <br /> <small>Opened Chat in message section</small>
           </Typography>
         )}
         {!disable && (

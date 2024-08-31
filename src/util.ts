@@ -46,4 +46,8 @@ export default function detectUrlType(url:any) {
   };
   
   // Helper function to format time ago (you can use your existing implementation)
-  
+  export const getInitials = (firstName: any, lastName: any) => {
+    const firstInitial = firstName ? firstName.charAt(0) : '';
+    const lastInitial = lastName ? lastName.charAt(0) : '';
+    return `${firstInitial}${lastInitial}`.toUpperCase();
+  };

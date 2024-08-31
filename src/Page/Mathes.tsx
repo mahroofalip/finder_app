@@ -17,7 +17,7 @@ import MessageOutlinedIcon from "@mui/icons-material/MessageOutlined";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import Grid from "@mui/material/Grid";
 import Badge from "@mui/material/Badge";
-import { Chip } from "@mui/material";
+import { Chip, Tooltip } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import Box from "@mui/material/Box";
@@ -34,7 +34,7 @@ import { OnlineBadge } from "../components/Badges/Badges";
 import { getTimeAgo } from "../components/TimeFunctions/TimeFunction";
 import { intewellToFetch, orangeHeaderBg } from "../consts";
 import { getProfile } from "../action/profileAction";
-import { calculateAge } from "../util";
+import { calculateAge, getInitials } from "../util";
 import InterestsComponent from "../components/Interests/InterestsChip";
 import { getMe } from "../action/authActions";
 import { addLike } from "../action/likeActions";
@@ -139,10 +139,11 @@ export default function MatchesCard() {
                           <Avatar
                             sx={{ bgcolor: red[500] }}
                             aria-label="recipe"
-                            src={'user'}
+                            src={user?.profileImage || undefined}
                           >
-                            {/* R */}
+                            {!user?.profileImage && getInitials(user?.firstName, user?.lastName)}
                           </Avatar>
+
                         </Badge>
                       }
                       title={
@@ -187,46 +188,54 @@ export default function MatchesCard() {
                       </h6>
                     </CardContent>
                     <CardActions sx={{ Padding: 0, margin: 0 }} disableSpacing>
-                      <IconButton
-                        aria-label="send message"
-                        onClick={() => handleClickOpenMessage(user)}
-                      >
-                        <MessageOutlinedIcon sx={{ color: orangeHeaderBg }} />
-                      </IconButton>
-                      <IconButton
-                        onClick={() => handleLike(user)}
-                        aria-label="add to favorites"
-                      >
-                        {!user?.isLiked ? (
-                          <FavoriteBorderOutlinedIcon sx={{ color: orangeHeaderBg }} />
-                        ) : (
-                          <FavoriteOutlinedIcon sx={{ color: "red" }} />
-                        )}
-                      </IconButton>
-                      <IconButton aria-label="share" onClick={() => handleCancelClick(user)}>
-                        <CancelIcon sx={{ color: orangeHeaderBg }} />
-                      </IconButton>
-                      {/* {!matches &&} */}
-
-                      {matches ? (
-                        <ExpandMore
-                          expand={expandedProfiles[index]}
-                          onClick={() => handleExpandClick(index)}
-                          aria-expanded={expandedProfiles[index]}
-                          aria-label="show more"
+                      <Tooltip title="Send Message">
+                        <IconButton
+                          aria-label="send message"
+                          onClick={() => handleClickOpenMessage(user)}
                         >
-                          <ExpandMoreIcon />
-                        </ExpandMore>
+                          <MessageOutlinedIcon sx={{ color: orangeHeaderBg }} />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title={!user?.isLiked ? "Like" : "Dislike"}>
+                        <IconButton
+                          onClick={() => handleLike(user)}
+                          aria-label="add to favorites"
+                        >
+                          {!user?.isLiked ? (
+                            <FavoriteBorderOutlinedIcon sx={{ color: orangeHeaderBg }} />
+                          ) : (
+                            <FavoriteOutlinedIcon sx={{ color: "red" }} />
+                          )}
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title={"Skip"}>
+                        <IconButton aria-label="skip" onClick={() => handleCancelClick(user)}>
+                          <CancelIcon sx={{ color: orangeHeaderBg }} />
+                        </IconButton>
+                      </Tooltip>
+                      {matches ? (
+                        <Tooltip title={"Expand Profile"}>
+                          <ExpandMore
+                            expand={expandedProfiles[index]}
+                            onClick={() => handleExpandClick(index)}
+                            aria-expanded={expandedProfiles[index]}
+                            aria-label="show more"
+                          >
+                            <ExpandMoreIcon />
+                          </ExpandMore>
+                        </Tooltip>
                       ) : (
                         <div style={{ marginLeft: "auto" }}>
-                          <IconButton
-                            onClick={() => {
-                              handleClickOpen(user.id)
-                            }}
-                            aria-label="info"
-                          >
-                            <InfoIcon sx={{ color: orangeHeaderBg }} />
-                          </IconButton>
+                          <Tooltip title={"About"}>
+                            <IconButton
+                              onClick={() => {
+                                handleClickOpen(user.id)
+                              }}
+                              aria-label="about"
+                            >
+                              <InfoIcon sx={{ color: orangeHeaderBg }} />
+                            </IconButton>
+                          </Tooltip>
                         </div>
                       )}
                     </CardActions>

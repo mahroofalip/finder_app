@@ -42,6 +42,19 @@ const userSlice = createSlice({
             state.loading = false;
             state.error = action.payload;
           },
+          blockProfileStart: (state) => {
+            state.loading = true;
+            state.error = null;
+          },
+          blockProfileSuccess: (state, action: PayloadAction<User>) => {
+            state.loading = false;
+            state.profile = action.payload;
+          },
+          blockProfileFailure: (state, action: PayloadAction<string>) => {
+            state.loading = false;
+            state.error = action.payload;
+          },
+          
     },
 });
 
@@ -52,10 +65,34 @@ export const {
     getProfileFailure,
     getProfileStart,
     getProfileSuccess,
-    updateUserInfoSuccess
+    updateUserInfoSuccess,
+    blockProfileFailure,
+    blockProfileStart,
+    blockProfileSuccess
 } = userSlice.actions;
 
+export const blockUser = (profileId: any) => async (dispatch: AppDispatch) => {
+  dispatch(blockProfileStart());
+  const token = localStorage.getItem("token"); 
 
+  try {
+    const response = await axios.put(
+      "http://localhost:5000/api/users/block-profile",
+      {profileId},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, 
+        },
+      }
+    );
+
+    dispatch(blockProfileSuccess(response.data));
+    
+  } catch (error: any) {
+      dispatch(blockProfileFailure(error.response.data));
+  }
+};
 export const updateUserProfile =
   (profile: any) => async (dispatch: AppDispatch) => {
     dispatch(updateUserInfoStart());
