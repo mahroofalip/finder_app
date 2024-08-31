@@ -31,7 +31,7 @@ import SearchingCriteria from "./Page/SearchingCriteria";
 import Visitors from "./Page/Visitors";
 import Likes from "./Page/Likes";
 import Blocked from "./Page/Blocked";
-import Ignored from "./Page/Ignored";
+import Skipped from "./Page/Ignored";
 import Messages from "./Page/Messages";
 import Login from "./Page/Login";
 import Register from "./Page/Register";
@@ -201,7 +201,7 @@ function App(props: Props) {
           "Visitors",
           "likes",
           "Messages",
-          "Ignored",
+          "Skipped",
           "Blocked",
           "Logout",
         ].map((text, index) => (
@@ -360,9 +360,9 @@ function App(props: Props) {
             <Messages />
           </>
         )}
-        {selectedMenuItem === "Ignored" && (
+        {selectedMenuItem === "Skipped" && (
           <>
-            <Ignored />
+            <Skipped />
           </>
         )}
         {selectedMenuItem === "Blocked" && (

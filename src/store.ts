@@ -96,6 +96,7 @@ export interface ProfessionOption {
 
 
 export interface User {
+  isLiked: boolean | null;
   password: string| null;
   phone: string| null;
   email: string| null;

@@ -6,6 +6,7 @@ import { getIgnoredProfileForUser, ignoreUser } from "../action/ignoreAction";
 import { intewellToFetch, orangeHeaderBg } from "../consts";
 import { Box } from "@mui/material";
 import ProfileList from "./ProfileList";
+import { addLike } from "../action/likeActions";
 
   
 
@@ -15,9 +16,17 @@ import ProfileList from "./ProfileList";
     const [openMessage, setOpenMessage] = React.useState(false);
     const { ignoredUsers, loading } = useSelector((state: RootState) => state.ignore);
   
-    const handleIgnore = (user: User) => {
-      dispatch(ignoreUser({ profileId: user.id }));
+    const handleLike = (user: User) => {
+      dispatch(addLike({ profileId: user.id }));
+      dispatch(getIgnoredProfileForUser());
+
     };
+    const removeUserfromIgnoredUserList = (user: User) => {
+      dispatch(ignoreUser({ profileId: user.id }));
+      dispatch(getIgnoredProfileForUser());
+
+    };
+    
     React.useEffect(() => {
       dispatch(getIgnoredProfileForUser());
       const intervalId = setInterval(() => {
@@ -47,10 +56,8 @@ import ProfileList from "./ProfileList";
           >
             Skipped Profiles
           </div>
-          <ProfileList setOpenMessage={setOpenMessage} openMessage={openMessage} list={ignoredUsers} me={null} handleClickOpenMessage={handleClickOpenMessage} handleFn={handleIgnore} selectedUser={selectedUser}
-            handleCancelClick={function (user: User): void {
-              throw new Error("Function not implemented.");
-            }} like={false} />
+          <ProfileList ignoreIcon={false} setOpenMessage={setOpenMessage} openMessage={openMessage} list={ignoredUsers} me={null} handleClickOpenMessage={handleClickOpenMessage} handleLike={handleLike} selectedUser={selectedUser} like={false}
+           handleCancelClick={removeUserfromIgnoredUserList} />
         </Box>
   
       </>

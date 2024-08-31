@@ -19,6 +19,8 @@ export default function Likes() {
 
   const handleLike = (user: User) => {
     dispatch(addLike({ profileId: user.id }));
+    dispatch(getLikesForUser());
+
   };
   React.useEffect(() => {
     dispatch(getLikesForUser());
@@ -50,7 +52,7 @@ export default function Likes() {
         >
           Likes For You
         </div>
-        <ProfileList setOpenMessage={setOpenMessage} openMessage={openMessage} list={likes} me={null} handleClickOpenMessage={handleClickOpenMessage} handleFn={handleLike} selectedUser={selectedUser}
+        <ProfileList setOpenMessage={setOpenMessage} ignoreIcon={true} openMessage={openMessage} list={likes} me={null} handleClickOpenMessage={handleClickOpenMessage} handleLike={handleLike} selectedUser={selectedUser}
           handleCancelClick={function (user: User): void {
             throw new Error("Function not implemented.");
           }} like={false} />

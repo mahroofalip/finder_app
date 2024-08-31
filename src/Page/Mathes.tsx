@@ -60,33 +60,25 @@ const GrayLabel = styled(Typography)({
   marginTop: 10,
 });
 
-
 type ExpandedProfiles = boolean[];
 
 export default function MatchesCard() {
-
   const dispatch: AppDispatch = useDispatch();
   const users = useSelector((state: RootState) => state.users.users);
   const user = useSelector((state: RootState) => state.auth);
   const { profile, loading, error } = useSelector((state: RootState) => state.updateUser);
   const getUser = useSelector((state: RootState) => state.auth.user);
-
-
-  const [expandedProfiles, setExpandedProfiles] =
-    React.useState<ExpandedProfiles>([]);
+  const [expandedProfiles, setExpandedProfiles] = React.useState<ExpandedProfiles>([]);
   const matches = useMediaQuery("(max-width:600px)");
-
   const [open, setOpen] = React.useState(false);
-  const [like, setLike] = React.useState(false);
   const [selectedUser, setSelectedUser] = React.useState(null);
-  const handleLike = (user:User) => {  
-    
-    dispatch(addLike({profileId:user.id}));
-    // setLike(!like);
+  const handleLike = (user: User) => {
+    dispatch(addLike({ profileId: user.id }));
+    dispatch(loadFinderUsers());
   };
-  const handleCancelClick = (user:User) => {
-    dispatch(ignoreUser({profileId:user.id}));
-    // setLike(!like);
+  const handleCancelClick = (user: User) => {
+    dispatch(ignoreUser({ profileId: user.id }));
+    dispatch(loadFinderUsers());
   };
   const handleClickOpenMessage = (user: any) => {
     setSelectedUser(user)
@@ -201,17 +193,17 @@ export default function MatchesCard() {
                       >
                         <MessageOutlinedIcon sx={{ color: orangeHeaderBg }} />
                       </IconButton>
-                      <IconButton 
-                       onClick={()=>handleLike(user)}
+                      <IconButton
+                        onClick={() => handleLike(user)}
                         aria-label="add to favorites"
                       >
-                        {!like ? (
+                        {!user?.isLiked ? (
                           <FavoriteBorderOutlinedIcon sx={{ color: orangeHeaderBg }} />
                         ) : (
                           <FavoriteOutlinedIcon sx={{ color: "red" }} />
                         )}
                       </IconButton>
-                      <IconButton aria-label="share" onClick={()=>handleCancelClick(user)}>
+                      <IconButton aria-label="share" onClick={() => handleCancelClick(user)}>
                         <CancelIcon sx={{ color: orangeHeaderBg }} />
                       </IconButton>
                       {/* {!matches &&} */}
@@ -420,9 +412,9 @@ export default function MatchesCard() {
               borderColor: orangeHeaderBg,
               color: orangeHeaderBg,
               '&:hover': {
-                backgroundColor: orangeHeaderBg, 
-                color: 'white', 
-                borderColor: orangeHeaderBg, 
+                backgroundColor: orangeHeaderBg,
+                color: 'white',
+                borderColor: orangeHeaderBg,
               },
             }}
             onClick={handleClose}
