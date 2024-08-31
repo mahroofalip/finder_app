@@ -37,7 +37,8 @@ import { getProfile } from "../action/profileAction";
 import { calculateAge } from "../util";
 import InterestsComponent from "../components/Interests/InterestsChip";
 import { getMe } from "../action/authActions";
-import { addLike, ignoreUser } from "../action/likeActions";
+import { addLike } from "../action/likeActions";
+import { ignoreUser } from "../action/ignoreAction";
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;

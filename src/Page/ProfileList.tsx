@@ -26,18 +26,16 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import ResponsiveMessageBox from "../components/MessageBox/MessageBox";
-import { loadFinderUsers } from "../action/usersAction";
 import { useDispatch } from "react-redux";
 import { AppDispatch, RootState, User } from "../store";
 import { useSelector } from "react-redux";
 import { OnlineBadge } from "../components/Badges/Badges";
 import { getTimeAgo } from "../components/TimeFunctions/TimeFunction";
-import { intewellToFetch, orangeHeaderBg } from "../consts";
+import {  orangeHeaderBg } from "../consts";
 import { getProfile } from "../action/profileAction";
 import { calculateAge } from "../util";
 import InterestsComponent from "../components/Interests/InterestsChip";
 import { getMe } from "../action/authActions";
-import { addLike, ignoreUser } from "../action/likeActions";
 
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean;
@@ -65,12 +63,15 @@ type ProfileListProps = {
     list: User[] | null;
     me: User | null;
     handleClickOpenMessage: (user: User) => void;
-    handleLike: (user: User) => void;
+    handleFn: (user: User) => void;
     handleCancelClick: (user: User) => void;
     like: boolean
+    setOpenMessage: React.Dispatch<React.SetStateAction<boolean>>;
+    openMessage: boolean;
+    selectedUser:User | null;
 };
 
-export default function ProfileList({ handleCancelClick, list, handleClickOpenMessage, handleLike }: ProfileListProps) {
+export default function ProfileList({ selectedUser,handleCancelClick, setOpenMessage,openMessage,list, handleClickOpenMessage, handleFn }: ProfileListProps) {
     const matches = useMediaQuery("(max-width:600px)");
     const [expandedProfiles, setExpandedProfiles] =
         React.useState<ExpandedProfiles>([]);
@@ -79,8 +80,6 @@ export default function ProfileList({ handleCancelClick, list, handleClickOpenMe
     const me = useSelector((state: RootState) => state.auth.user);
     const [open, setOpen] = React.useState(false);
     const [like, setLike] = React.useState(false);
-    const [selectedUser, setSelectedUser] = React.useState(null);
-    const [openMessage, setOpenMessage] = React.useState(false);
 
     const handleClickOpen = (id?: any) => {
         dispatch(getProfile(id));
@@ -180,7 +179,7 @@ export default function ProfileList({ handleCancelClick, list, handleClickOpenMe
                                                 <MessageOutlinedIcon sx={{ color: orangeHeaderBg }} />
                                             </IconButton>
                                             <IconButton
-                                                onClick={() => handleLike(user)}
+                                                onClick={() => handleFn(user)}
                                                 aria-label="add to favorites"
                                             >
                                                 {!like ? (

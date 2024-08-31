@@ -45,7 +45,7 @@ export default function ChatPage(props: any) {
   // Listen for incoming messages
   useEffect(() => {
     const handleReceiveMessage = (data: any) => {
-      console.log(data?.senderId != user?.id, "datadatadatadata b");
+      console.log(data, "datadatadatadata b");
       // if (data?.sender_Id != user?.id) {
         dispatch(pushReciverNewMessage(data));
       // }
@@ -53,15 +53,10 @@ export default function ChatPage(props: any) {
 
     socket.on("receive-message", handleReceiveMessage);
 
-    // socket.on("disconnect", () => {
-    //   socket.connect();
-    // });
-
-    // // Cleanup on unmount
-    // return () => {
-    //   socket.off("receive-message", handleReceiveMessage);
-    // };
-  }, [dispatch]);
+    return () => {
+      socket.off("receive-message");
+    };
+  }, []);
 
 
   const submitMessage = () => {

@@ -11,6 +11,7 @@ import googleMapPlaceAction from './action/googleMapPlaceAction';
 import updateUserProfile  from './action/profileAction';
 import intrestsOptionsAction from './action/intrestsOptionsAction';
 import likeAction from './action/likeActions'
+import ignoreAction from './action/ignoreAction';
 
 
 
@@ -28,7 +29,8 @@ export const store = configureStore({
     hairColorOption:hairColorOptionsAction,
     googlePlaces:googleMapPlaceAction,
     updateUser:updateUserProfile,
-    like:likeAction
+    like:likeAction,
+    ignore:ignoreAction
   },
 });
 
@@ -141,8 +143,13 @@ export interface UserState {
 export interface likeState {
   like:User | null,
   likes:User[] | null,
-  cancel:User | null,
-  cancelledUsers:User[] | null,
+  loading: boolean;
+  error: string | null;
+}
+
+export interface ignoreState {
+  ignoredUser:User | null,
+  ignoredUsers:User[] | null,
   loading: boolean;
   error: string | null;
 }
