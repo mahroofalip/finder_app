@@ -34,7 +34,6 @@ export default function Likes() {
 
 
   const handleClickOpenMessage = (user: any) => {
-    console.log(user, "handleClickOpenMessage");
     setSelectedUser(user)
     setOpenMessage(true);
   };

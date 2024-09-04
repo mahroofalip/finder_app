@@ -9,8 +9,8 @@ import socket from '../socket.ts/socket';
 
 const initialState: MessageState = {
     messages: [],
-    selectedMessages:[],
-    chat:null,
+    selectedMessages: [],
+    chat: null,
     loading: false,
     error: null,
 };
@@ -21,31 +21,11 @@ const messageSlice = createSlice({
     reducers: {
         sendMessageStart: (state, action: PayloadAction<{ newMessage: string, userId: string }>) => {
             socket.connect();
-            // const { newMessage, userId } = action.payload;
-            // const msg = {
-            //     createdAt: new Date(),
-            //     message_content: newMessage,
-            //     senderId: userId,
-            // };
-        
-            // // Check for duplicates based on message content and timestamp (including milliseconds)
-            // const isDuplicate = state.selectedMessages.some((existingMsg: { message_content: string; senderId: string; createdAt: { getTime: () => number; }; }) => 
-            //     existingMsg.message_content === msg.message_content &&
-            //     existingMsg.senderId === msg.senderId &&
-            //     existingMsg.createdAt.getTime() === msg.createdAt.getTime()
-            // );
-        
-            // if (!isDuplicate) {
-                state.loading = true;
-                state.error = null;
-            //     state.selectedMessages.push(msg);
-            // } else {
-            //     console.log('Duplicate message detected, not adding to list.');
-            // }
+            state.loading = true;
+            state.error = null;
         },
         sendMessageSuccess: (state, action: PayloadAction<any>) => {
             state.loading = false;
-            console.log(action);
             state.selectedMessages.push(action.payload);
         },
         sendMessageFailure: (state, action: PayloadAction<string>) => {
@@ -87,7 +67,7 @@ const messageSlice = createSlice({
             state.loading = false;
             state.error = action.payload;
         },
-    
+
     },
 });
 
@@ -106,12 +86,12 @@ export const {
     createRoomFailure
 } = messageSlice.actions;
 
-export const sendMessage = (newMessage: any,roomId:any,userId:any) => async (dispatch: AppDispatch) => {
+export const sendMessage = (newMessage: any, roomId: any, userId: any) => async (dispatch: AppDispatch) => {
     dispatch(sendMessageStart({ newMessage, userId }));
     try {
 
         const token = localStorage.getItem('token'); // Retrieve the token from local storage
-        const response = await axios.post('http://localhost:5000/api/messages/createNewMessage', {newMessage,roomId}, {
+        const response = await axios.post('http://localhost:5000/api/messages/createNewMessage', { newMessage, roomId }, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}` // Include the token in the Authorization header
@@ -123,7 +103,7 @@ export const sendMessage = (newMessage: any,roomId:any,userId:any) => async (dis
     }
 };
 export const pushReciverNewMessage = (message: any) => async (dispatch: AppDispatch) => {
-        dispatch(sendMessageSuccess(message));
+    dispatch(sendMessageSuccess(message));
 };
 
 export const loadUserChats = () => async (dispatch: AppDispatch) => {
@@ -142,11 +122,11 @@ export const loadUserChats = () => async (dispatch: AppDispatch) => {
         dispatch(loadUserChatsFailure(error.message));
     }
 };
-export const createRoom = (sender_id : any,receiver_id:any,message_content:any) => async (dispatch: AppDispatch) => {
+export const createRoom = (sender_id: any, receiver_id: any, message_content: any) => async (dispatch: AppDispatch) => {
     dispatch(createRoomStart());
     try {
-        const token = localStorage.getItem('token'); 
-        const response = await axios.post('http://localhost:5000/api/messages/createRoomAndSendMessage', {receiver_id,sender_id,message_content}, {
+        const token = localStorage.getItem('token');
+        const response = await axios.post('http://localhost:5000/api/messages/createRoomAndSendMessage', { receiver_id, sender_id, message_content }, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}` // Include the token in the Authorization header
@@ -162,13 +142,13 @@ export const getMessagesByRoomId = (roomId: Message) => async (dispatch: AppDisp
     dispatch(receiveMessageStart());
     try {
         const token = localStorage.getItem('token'); // Retrieve the token from local storage
-        const response = await axios.post('http://localhost:5000/api/messages/getMessagesByRoomId',{roomId}, {
+        const response = await axios.post('http://localhost:5000/api/messages/getMessagesByRoomId', { roomId }, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}` // Include the token in the Authorization header
             },
         });
-        
+
         dispatch(receiveMessageSuccess(response.data.messages));
     } catch (error: any) {
         dispatch(receiveMessageFailure(error.message));

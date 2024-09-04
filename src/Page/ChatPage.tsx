@@ -61,7 +61,6 @@ export default function ChatPage(props: any) {
 
   useEffect(() => {
     const handleReceiveMessage = (data: any) => {
-      console.log(data, "datadatadatadata b");
       dispatch(pushReciverNewMessage(data));
     };
     socket.on("receive-message", handleReceiveMessage);
