@@ -23,6 +23,7 @@ const Subheader: React.FC<{ messageRoom: any; user: any }> = ({ messageRoom, use
         ? "Online"
         : getTimeAgoSp(updatedAt)}
       <OnlineBadge />
+      
     </Typography>
   );
 };

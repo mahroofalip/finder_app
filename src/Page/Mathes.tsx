@@ -39,6 +39,7 @@ import InterestsComponent from "../components/Interests/InterestsChip";
 import { getMe } from "../action/authActions";
 import { addLike } from "../action/likeActions";
 import { ignoreUser } from "../action/ignoreAction";
+import { addVisitor } from "../action/visitorActions";
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -66,15 +67,16 @@ export default function MatchesCard() {
   const dispatch: AppDispatch = useDispatch();
   const users = useSelector((state: RootState) => state.users.users);
   const user = useSelector((state: RootState) => state.auth);
-  const { profile, loading, error } = useSelector((state: RootState) => state.updateUser);
+  const { profile, loading, error } = useSelector((state: RootState) => state.pofile);
   const getUser = useSelector((state: RootState) => state.auth.user);
   const [expandedProfiles, setExpandedProfiles] = React.useState<ExpandedProfiles>([]);
   const matches = useMediaQuery("(max-width:600px)");
   const [open, setOpen] = React.useState(false);
   const [selectedUser, setSelectedUser] = React.useState(null);
   const handleLike = (user: User) => {
-    dispatch(addLike({ profileId: user.id }));
-    dispatch(loadFinderUsers());
+    dispatch(addLike({ profileId: user.id })).finally(()=>{
+      dispatch(loadFinderUsers());
+    })
   };
   const handleCancelClick = (user: User) => {
     dispatch(ignoreUser({ profileId: user.id }));
@@ -88,6 +90,7 @@ export default function MatchesCard() {
   const [openMessage, setOpenMessage] = React.useState(false);
 
   const handleClickOpen = (id?: any) => {
+    dispatch(addVisitor({ profileId: id }));
     dispatch(getProfile(id));
     setOpen(true);
   };
@@ -107,7 +110,8 @@ export default function MatchesCard() {
   }, [dispatch, user, intewellToFetch]);
 
 
-  const handleExpandClick = (index: number) => {
+  const handleExpandClick = (index: number,id:any) => {
+    dispatch(addVisitor({ profileId: id }));
     const expandedProfilesCopy = [...expandedProfiles];
     expandedProfilesCopy[index] = !expandedProfilesCopy[index];
     setExpandedProfiles(expandedProfilesCopy);
@@ -217,7 +221,7 @@ export default function MatchesCard() {
                         <Tooltip title={"Expand Profile"}>
                           <ExpandMore
                             expand={expandedProfiles[index]}
-                            onClick={() => handleExpandClick(index)}
+                            onClick={() => handleExpandClick(index,user.id)}
                             aria-expanded={expandedProfiles[index]}
                             aria-label="show more"
                           >

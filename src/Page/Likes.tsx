@@ -18,8 +18,9 @@ export default function Likes() {
   const { likes, loading } = useSelector((state: RootState) => state.like);
 
   const handleLike = (user: User) => {
-    dispatch(addLike({ profileId: user.id }));
-    dispatch(getLikesForUser());
+    dispatch(addLike({ profileId: user.id })).finally(()=>{
+      dispatch(getLikesForUser());
+    })
 
   };
   React.useEffect(() => {
@@ -55,7 +56,9 @@ export default function Likes() {
         <ProfileList setOpenMessage={setOpenMessage} ignoreIcon={true} openMessage={openMessage} list={likes} me={null} handleClickOpenMessage={handleClickOpenMessage} handleLike={handleLike} selectedUser={selectedUser}
           handleCancelClick={function (user: User): void {
             throw new Error("Function not implemented.");
-          }} like={false} />
+          }} likeIcon={true} unblockProfile={function (user: User): void {
+            throw new Error("Function not implemented.");
+          }} messageIcon={true} unblcokIcon={false} />
       </Box>
 
     </>

@@ -7,6 +7,7 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import ChatPage from "./ChatPage";
+import BlockIcon from '@mui/icons-material/Block';
 import { loadUserChats } from "../action/messageActions";
 import { useDispatch } from "react-redux";
 import { AppDispatch, Message, RootState } from "../store";
@@ -18,6 +19,8 @@ import { OnlineBadge } from "../components/Badges/Badges";
 import { getMe } from "../action/authActions";
 import { intewellToFetch } from "../consts";
 import { updateUserOnlineStatus } from "../action/usersAction";
+import { IconButton, Tooltip } from "@mui/material";
+import { blockUser } from "../action/profileAction";
 
 interface User {
   name: {
@@ -34,15 +37,18 @@ interface User {
 
 const Messages: React.FC = () => {
 
-  const chatRooms = useSelector((state: RootState) => state.message.messages);
+  const { messages } = useSelector((state: RootState) => state.message);
   const user = useSelector((state: RootState) => state.auth.user);
 
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
   const dispatch: AppDispatch = useDispatch();
+  const [change, setChange] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    dispatch(loadUserChats()); // Fetch users from your backend
+    dispatch(loadUserChats());
   }, [dispatch]);
+
+
   React.useEffect(() => {
     const token = localStorage.getItem("token");
     dispatch(getMe());
@@ -50,13 +56,8 @@ const Messages: React.FC = () => {
 
   React.useEffect(() => {
     socket.on("receive-message", (data: Message) => {
-      dispatch(loadUserChats()); // Fetch users from your backend
+      dispatch(loadUserChats());
     });
-
-    // return () => {
-    //   socket.off("receive-message");
-    //   socket.disconnect();
-    // };
   }, [dispatch]);
 
   const handleUserClick = (user: User) => {
@@ -66,7 +67,20 @@ const Messages: React.FC = () => {
     setSelectedUser(null)
     dispatch(loadUserChats());
   };
-  
+
+
+  const blockUserFn = (event: React.MouseEvent, roomId: any, profileId: any) => {
+    event.stopPropagation(); // Prevents the click from propagating to the ListItem
+    dispatch(blockUser(roomId, profileId));
+    setChange(!change)
+  };
+
+  React.useEffect(() => {
+    dispatch(loadUserChats());
+  }, [change]);
+
+
+
   React.useEffect(() => {
     const intervalId = setInterval(() => {
       dispatch(loadUserChats());
@@ -82,7 +96,7 @@ const Messages: React.FC = () => {
         <ChatPage backToMessageList={nullfyUserSelect} messageRoom={selectedUser} onClose={() => setSelectedUser(null)} />
       ) : (
         <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-          {chatRooms.map((chat: any, index: any) => (
+          {messages.map((chat: any, index: any) => (
 
             <React.Fragment key={index}>
               <ListItem
@@ -91,12 +105,21 @@ const Messages: React.FC = () => {
                 onClick={() => handleUserClick(chat)}
               >
                 <ListItemAvatar>
-                  <Avatar alt={""} src={chat?.Receiver?.profileImage} />
+                  <Avatar alt={chat?.Receiver?.firstName} src={
+                     chat?.senderId === user?.id
+                     ? chat?.Receiver.profileImage
+                     : chat?.Sender.profileImage
+                     } />
                 </ListItemAvatar>
+
+                   {/* {JSON.stringify(chat, null, 2)} */}
+              
                 <ListItemText
                   primary={`${chat?.senderId == user?.id ? chat?.Receiver?.firstName : chat?.Sender?.firstName}  ${chat?.senderId == user?.id ? chat?.Receiver?.lastName : chat?.Sender?.lastName}, ${calculateAge(chat?.Receiver?.birthDate)}`}
+
                   secondary={
                     <React.Fragment>
+
                       <div
                         style={{
                           display: "flex",
@@ -109,8 +132,10 @@ const Messages: React.FC = () => {
                           variant="body2"
                           color="gray"
                         >
-                          You: {chat?.last_message_content}
+                          {chat?.last_message_content}
+
                         </Typography>
+
                         <Typography
                           sx={{ display: "inline" }}
                           component="span"
@@ -139,18 +164,37 @@ const Messages: React.FC = () => {
                                 )
                           }
 
+                          <Tooltip sx={{ ml: 2 }} title="Block">
+                            <IconButton
+                              onClick={(event) =>
+                                blockUserFn(
+                                  event,
+                                  chat.id,
+                                  chat?.Receiver?.id !== user?.id ? chat?.Receiver?.id : chat?.Sender?.id
+                                )
+                              }
+                              aria-label="block"
+                            >
+                              <BlockIcon />
+                            </IconButton>
+                          </Tooltip>
+
                         </Typography>
 
+
                       </div>
+
                     </React.Fragment>
                   }
                 />
+
               </ListItem>
-              {index < chatRooms.length - 1 && (
+              {index < messages.length - 1 && (
                 <Divider variant="inset" component="li" />
               )}
             </React.Fragment>
           ))}
+
         </List>
       )}
     </>

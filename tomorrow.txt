@@ -1,7 +1,7 @@
-first fix the problom with froned blcokuser
-1. block user test 
-2. get block usr list
-3. chat box manage message list manage, chnage to unblock
+first fix the problom with froned blcokuser ✅
+1. block user test ✅
+2. get block usr list ✅
+3. chat box manage message list manage, chnage to unblock ✅ 
 4. profile list pages should not show them and list in blocked section
 5. unbock and manage list profile and blocked list and user chat access
 6. delete message, clear all chats
@@ -13,6 +13,7 @@ first fix the problom with froned blcokuser
 12. facebook sign , singup
 13. account deletion option
 14. after signup redirect to prfile and then access
+15. sort by online to dsec mathing and ohter screen profiles
 
 
 change to db aws

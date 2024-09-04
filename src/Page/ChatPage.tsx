@@ -5,10 +5,13 @@ import {
   Box,
   CardHeader,
   InputAdornment,
+  Menu,
+  MenuItem,
   TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import BlockIcon from '@mui/icons-material/Block';
 import { format, isToday, isYesterday, differenceInDays } from 'date-fns';
 import SendIcon from "@mui/icons-material/Send";
@@ -16,7 +19,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import IconButton from "@mui/material/IconButton";
 import { useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../store";
-import { getMessagesByRoomId, pushReciverNewMessage, sendMessage } from "../action/messageActions";
+import { getMessagesByRoomId, loadUserChats, pushReciverNewMessage, sendMessage } from "../action/messageActions";
 import { blockUser } from "../action/profileAction";
 import socket from "../socket.ts/socket";
 import { useSelector } from "react-redux";
@@ -34,9 +37,22 @@ export default function ChatPage(props: any) {
     window.innerHeight * 0.6
   );
   const user = useSelector((state: RootState) => state.auth.user);
-  const blockUser =(profileId:any)=>{
-    dispatch(blockUser(profileId));
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  const blockUserFn = (roomId: any, profileId: any) => {
+    dispatch(blockUser(roomId, profileId)).then(() => {
+      dispatch(loadUserChats()).then(() => {
+        props.backToMessageList()
+        handleClose();
+      })
+    })
   }
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleAvatarClick = (event: any) => {
+    setAnchorEl(event.currentTarget);
+  };
   useEffect(() => {
     if (props.messageRoom.id) {
       dispatch(getMessagesByRoomId(props.messageRoom.id));
@@ -112,7 +128,7 @@ export default function ChatPage(props: any) {
       }
     }
   };
-  
+
 
   let lastMessageDate: string | null = null;
 
@@ -120,6 +136,7 @@ export default function ChatPage(props: any) {
     <Box style={{ border: "1px solid #ded9d9", borderRadius: "5px" }}>
 
       <div>
+
         <CardHeader
           sx={{ backgroundColor: "#f2f7f4" }}
           avatar={
@@ -130,50 +147,64 @@ export default function ChatPage(props: any) {
                 </IconButton>
               </Tooltip>
 
-
               <Badge
                 overlap="circular"
                 anchorOrigin={{
                   vertical: "bottom",
                   horizontal: "right",
                 }}
-                sx={{ marginLeft: 3 }}
               >
                 <Avatar
                   aria-label="recipe"
                   src={
-                    props?.messageRoom?.senderId == user?.id
+                    props?.messageRoom?.senderId === user?.id
                       ? props?.messageRoom?.Receiver.profileImage
                       : props?.messageRoom?.Sender.profileImage
                   }
+
+                  style={{ cursor: 'pointer' }}
                 />
               </Badge>
             </>
           }
           title={
             <Typography variant="body1" color={"black"}>
-              {props?.messageRoom?.senderId == user?.id
-                ? `${props?.messageRoom?.Receiver.firstName} ${props?.messageRoom?.Receiver.lastName}`
-                : `${props?.messageRoom?.Sender.firstName} ${props?.messageRoom?.Sender.lastName}`},&nbsp;
-              {calculateAge(
-                props?.messageRoom?.senderId == user?.id
+              {props?.messageRoom?.senderId === user?.id
+                ? `${props?.messageRoom?.Receiver.firstName}`
+                : `${props?.messageRoom?.Sender.firstName}`}&nbsp;
+              {/* {calculateAge(
+                props?.messageRoom?.senderId === user?.id
                   ? props?.messageRoom?.Receiver?.birthDate
                   : props?.messageRoom?.Sender?.birthDate
-              )},&nbsp;
-              {props?.messageRoom?.senderId == user?.id
+              )},&nbsp; */}
+              {/* {props?.messageRoom?.senderId === user?.id
                 ? props?.messageRoom?.Receiver.place
-                : props?.messageRoom?.Sender.place}
+                : props?.messageRoom?.Sender.place} */}
             </Typography>
           }
-          subheader={<Subheader messageRoom={props?.messageRoom} user={user} />}
+          subheader={
+            <Subheader messageRoom={props?.messageRoom} user={user} />
+          }
           action={
-            <Tooltip title="Block">
-              <IconButton onClick={()=>blockUser(props?.messageRoom?.senderId == user?.id?props?.messageRoom?.Receiver.id
-                :props?.messageRoom?.Sender.id
-              )} aria-label="block">
-                <BlockIcon />
-              </IconButton>
-            </Tooltip>
+            <>
+              <MoreVertIcon onClick={handleAvatarClick} />
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+              >
+                <MenuItem onClick={() => blockUserFn(
+                  props?.messageRoom?.id,
+                  props?.messageRoom?.senderId === user?.id
+                    ? props?.messageRoom?.Receiver.id
+                    : props?.messageRoom?.Sender.id
+                )}>
+                  <BlockIcon sx={{ marginRight: 1 }} />
+                  Block
+                </MenuItem>
+              </Menu>
+            </>
+
           }
         />
 
@@ -254,9 +285,9 @@ export default function ChatPage(props: any) {
             endAdornment: (
               <InputAdornment position="end">
                 <Tooltip title="Send">
-                <IconButton aria-label="send message" onClick={submitMessage}>
-                  <SendIcon sx={{ color: orangeHeaderBg }} />
-                </IconButton>
+                  <IconButton aria-label="send message" onClick={submitMessage}>
+                    <SendIcon sx={{ color: orangeHeaderBg }} />
+                  </IconButton>
                 </Tooltip>
               </InputAdornment>
             ),

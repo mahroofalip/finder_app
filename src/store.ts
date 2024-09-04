@@ -8,10 +8,11 @@ import professionOptionsAction from './action/professionOptionsAction';
 import eyeColorOptionsAction from './action/eyeColorAction';
 import hairColorOptionsAction from './action/hairColorAction';
 import googleMapPlaceAction from './action/googleMapPlaceAction';
-import updateUserProfile  from './action/profileAction';
+import profileAction  from './action/profileAction';
 import intrestsOptionsAction from './action/intrestsOptionsAction';
 import likeAction from './action/likeActions'
 import ignoreAction from './action/ignoreAction';
+import visitorActions from './action/visitorActions';
 
 
 
@@ -28,9 +29,10 @@ export const store = configureStore({
     eyeColorOption:eyeColorOptionsAction,
     hairColorOption:hairColorOptionsAction,
     googlePlaces:googleMapPlaceAction,
-    updateUser:updateUserProfile,
+    pofile:profileAction,
     like:likeAction,
-    ignore:ignoreAction
+    ignore:ignoreAction,
+    visitor:visitorActions
   },
 });
 
@@ -135,6 +137,7 @@ export interface AuthState {
 
 export interface UserState {
   users: User[];
+  blockedUsers: User[];
   user:User| null;
   profile:any;
   loading: boolean;
@@ -148,6 +151,12 @@ export interface likeState {
   error: string | null;
 }
 
+export interface visitorState {
+  visitor:User | null,
+  visitors:User[] | null,
+  loading: boolean;
+  error: string | null;
+}
 export interface ignoreState {
   ignoredUser:User | null,
   ignoredUsers:User[] | null,

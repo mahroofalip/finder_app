@@ -36,6 +36,8 @@ import { getProfile } from "../action/profileAction";
 import { calculateAge } from "../util";
 import InterestsComponent from "../components/Interests/InterestsChip";
 import { getMe } from "../action/authActions";
+import LockOpenIcon from '@mui/icons-material/LockOpen';
+import { addVisitor } from "../action/visitorActions";
 
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean;
@@ -65,23 +67,27 @@ type ProfileListProps = {
     handleClickOpenMessage: (user: User) => void;
     handleLike: (user: User) => void;
     handleCancelClick: (user: User) => void;
-    like: boolean
+    unblockProfile: (user: User) => void;
+    likeIcon: boolean
     setOpenMessage: React.Dispatch<React.SetStateAction<boolean>>;
     openMessage: boolean;
     ignoreIcon: boolean;
+    messageIcon: boolean;
+    unblcokIcon: boolean;
     selectedUser: User | null;
 };
 
-export default function ProfileList({ selectedUser, handleCancelClick, ignoreIcon,setOpenMessage, openMessage, list, handleClickOpenMessage, handleLike }: ProfileListProps) {
+export default function ProfileList({ likeIcon , unblcokIcon,selectedUser,unblockProfile, messageIcon, handleCancelClick, ignoreIcon, setOpenMessage, openMessage, list, handleClickOpenMessage, handleLike }: ProfileListProps) {
     const matches = useMediaQuery("(max-width:600px)");
     const [expandedProfiles, setExpandedProfiles] =
         React.useState<ExpandedProfiles>([]);
     const dispatch: AppDispatch = useDispatch();
-    const { profile, loading, error } = useSelector((state: RootState) => state.updateUser);
+    const { profile, loading, error } = useSelector((state: RootState) => state.pofile);
     const me = useSelector((state: RootState) => state.auth.user);
     const [open, setOpen] = React.useState(false);
 
     const handleClickOpen = (id?: any) => {
+        dispatch(addVisitor({ profileId: id }));
         dispatch(getProfile(id));
         setOpen(true);
     };
@@ -90,7 +96,8 @@ export default function ProfileList({ selectedUser, handleCancelClick, ignoreIco
         setOpen(false);
     };
 
-    const handleExpandClick = (index: number) => {
+    const handleExpandClick = (index: number,id:any) => {
+        dispatch(addVisitor({ profileId: id }));
         const expandedProfilesCopy = [...expandedProfiles];
         expandedProfilesCopy[index] = !expandedProfilesCopy[index];
         setExpandedProfiles(expandedProfilesCopy);
@@ -172,12 +179,14 @@ export default function ProfileList({ selectedUser, handleCancelClick, ignoreIco
                                             </h6>
                                         </CardContent>
                                         <CardActions sx={{ Padding: 0, margin: 0 }} disableSpacing>
-                                            <IconButton
+
+                                            {messageIcon && <IconButton
                                                 aria-label="send message"
                                                 onClick={() => handleClickOpenMessage(user)}
                                             >
                                                 <MessageOutlinedIcon sx={{ color: orangeHeaderBg }} />
-                                            </IconButton>
+                                            </IconButton>}
+                                            {likeIcon &&
                                             <IconButton
                                                 onClick={() => handleLike(user)}
                                                 aria-label="add to favorites"
@@ -187,9 +196,12 @@ export default function ProfileList({ selectedUser, handleCancelClick, ignoreIco
                                                 ) : (
                                                     <FavoriteOutlinedIcon sx={{ color: "red" }} />
                                                 )}
-                                            </IconButton>
+                                            </IconButton>}
                                             {ignoreIcon && <IconButton aria-label="share" onClick={() => handleCancelClick(user)}>
                                                 <CancelIcon sx={{ color: orangeHeaderBg }} />
+                                            </IconButton>}
+                                            {unblcokIcon && <IconButton aria-label="share" onClick={() => unblockProfile(user)}>
+                                                <LockOpenIcon sx={{ color: orangeHeaderBg }} />
                                             </IconButton>}
 
                                             {/* {!matches &&} */}
@@ -197,7 +209,7 @@ export default function ProfileList({ selectedUser, handleCancelClick, ignoreIco
                                             {matches ? (
                                                 <ExpandMore
                                                     expand={expandedProfiles[index]}
-                                                    onClick={() => handleExpandClick(index)}
+                                                    onClick={() => handleExpandClick(index,user.id)}
                                                     aria-expanded={expandedProfiles[index]}
                                                     aria-label="show more"
                                                 >
