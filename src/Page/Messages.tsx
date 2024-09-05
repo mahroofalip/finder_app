@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import Divider from "@mui/material/Divider";
@@ -13,14 +13,15 @@ import { useDispatch } from "react-redux";
 import { AppDispatch, Message, RootState } from "../store";
 import { useSelector } from "react-redux";
 import socket from "../socket.ts/socket";
-import { calculateAge } from "../util";
+import { calculateAge, playSound } from "../util";
 import { getTimeAgo } from "../components/TimeFunctions/TimeFunction";
 import { OnlineBadge } from "../components/Badges/Badges";
 import { getMe } from "../action/authActions";
 import { intewellToFetch } from "../consts";
 import { updateUserOnlineStatus } from "../action/usersAction";
-import { IconButton, Tooltip } from "@mui/material";
+import { Box, IconButton, Tooltip } from "@mui/material";
 import { blockUser } from "../action/profileAction";
+import AlertComponent from "../components/Alerts/AlertComponent";
 
 interface User {
   name: {
@@ -36,18 +37,17 @@ interface User {
 }
 
 const Messages: React.FC = () => {
-
   const { messages } = useSelector((state: RootState) => state.message);
   const user = useSelector((state: RootState) => state.auth.user);
 
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
   const dispatch: AppDispatch = useDispatch();
   const [change, setChange] = React.useState<boolean>(false);
+  const [blockAlert, setBlockAlert] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     dispatch(loadUserChats());
   }, [dispatch]);
-
 
   React.useEffect(() => {
     const token = localStorage.getItem("token");
@@ -58,28 +58,34 @@ const Messages: React.FC = () => {
     socket.on("receive-message", (data: Message) => {
       dispatch(loadUserChats());
     });
+
+    socket.on("blocked-you-user", (data: { username: string }) => {
+      // Update the block alert message
+      setBlockAlert(`${data.username} has blocked you.`);
+      
+      // Play the sound notification
+      playSound()
+    });
   }, [dispatch]);
 
   const handleUserClick = (user: User) => {
     setSelectedUser(user);
   };
+
   const nullfyUserSelect = () => {
-    setSelectedUser(null)
+    setSelectedUser(null);
     dispatch(loadUserChats());
   };
-
 
   const blockUserFn = (event: React.MouseEvent, roomId: any, profileId: any) => {
     event.stopPropagation(); // Prevents the click from propagating to the ListItem
     dispatch(blockUser(roomId, profileId));
-    setChange(!change)
+    setChange(!change);
   };
 
   React.useEffect(() => {
     dispatch(loadUserChats());
   }, [change]);
-
-
 
   React.useEffect(() => {
     const intervalId = setInterval(() => {
@@ -92,12 +98,18 @@ const Messages: React.FC = () => {
 
   return (
     <>
+      {blockAlert && (
+        <AlertComponent
+          icon={<BlockIcon />}
+          severity="error"
+          message={blockAlert}
+        />
+      )}
       {selectedUser ? (
         <ChatPage backToMessageList={nullfyUserSelect} messageRoom={selectedUser} onClose={() => setSelectedUser(null)} />
       ) : (
         <List sx={{ width: "100%", bgcolor: "background.paper" }}>
           {messages.map((chat: any, index: any) => (
-
             <React.Fragment key={index}>
               <ListItem
                 alignItems="flex-start"
@@ -106,20 +118,16 @@ const Messages: React.FC = () => {
               >
                 <ListItemAvatar>
                   <Avatar alt={chat?.Receiver?.firstName} src={
-                     chat?.senderId === user?.id
-                     ? chat?.Receiver.profileImage
-                     : chat?.Sender.profileImage
-                     } />
+                    chat?.senderId === user?.id
+                      ? chat?.Receiver.profileImage
+                      : chat?.Sender.profileImage
+                  } />
                 </ListItemAvatar>
 
-                   {/* {JSON.stringify(chat, null, 2)} */}
-              
                 <ListItemText
                   primary={`${chat?.senderId == user?.id ? chat?.Receiver?.firstName : chat?.Sender?.firstName}  ${chat?.senderId == user?.id ? chat?.Receiver?.lastName : chat?.Sender?.lastName}, ${calculateAge(chat?.Receiver?.birthDate)}`}
-
                   secondary={
                     <React.Fragment>
-
                       <div
                         style={{
                           display: "flex",
@@ -133,7 +141,6 @@ const Messages: React.FC = () => {
                           color="gray"
                         >
                           {chat?.last_message_content}
-
                         </Typography>
 
                         <Typography
@@ -178,23 +185,18 @@ const Messages: React.FC = () => {
                               <BlockIcon />
                             </IconButton>
                           </Tooltip>
-
                         </Typography>
-
-
                       </div>
-
                     </React.Fragment>
                   }
                 />
-
               </ListItem>
               {index < messages.length - 1 && (
                 <Divider variant="inset" component="li" />
               )}
             </React.Fragment>
           ))}
-
+          {messages?.length === 0 &&  <Box sx={{display:"flex", justifyContent:"center"}}>No Messages</Box>}
         </List>
       )}
     </>
