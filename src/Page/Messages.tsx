@@ -59,12 +59,13 @@ const Messages: React.FC = () => {
       dispatch(loadUserChats());
     });
 
-    socket.on("blocked-you-user", (data: { username: string }) => {
-      // Update the block alert message
-      setBlockAlert(`${data.username} has blocked you.`);
-      
-      // Play the sound notification
-      playSound()
+    socket.on("blocked-you-user", (data: any) => {
+      if (user?.id === data?.blockedId) {
+        nullfyUserSelect()
+        setBlockAlert(data?.message);
+        dispatch(loadUserChats());
+        playSound();
+      }
     });
   }, [dispatch]);
 
@@ -196,7 +197,7 @@ const Messages: React.FC = () => {
               )}
             </React.Fragment>
           ))}
-          {messages?.length === 0 &&  <Box sx={{display:"flex", justifyContent:"center"}}>No Messages</Box>}
+          {messages?.length === 0 && <Box sx={{ display: "flex", justifyContent: "center" }}>No Messages</Box>}
         </List>
       )}
     </>
