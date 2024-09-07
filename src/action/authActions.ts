@@ -89,6 +89,7 @@ export const loginUser = (userData: User) => async (dispatch: AppDispatch) => {
     localStorage.setItem("token", token);
     dispatch(loginSuccess(response.data));
   } catch (error: any) {
+    localStorage.removeItem("token");
     dispatch(loginFailure(error.message));
   }
 };
@@ -113,34 +114,41 @@ export const registerUser =
       dispatch(registerSuccess(response.data));
     } catch (error: any) {
       if (error?.response?.data?.status === "exist") {
+        localStorage.removeItem("token");
         dispatch(registerExistingUser(error.response.data));
       } else {
+        localStorage.removeItem("token");
         dispatch(registerFailure(error.response.data));
       }
     }
   };
 
-  export const getMe = () => async (dispatch: AppDispatch) => {
-    const token = localStorage.getItem("token"); 
+export const getMe = () => async (dispatch: AppDispatch) => {
+  const token = localStorage.getItem("token");
   dispatch(getMeStart());
-    try {
-      const response = await axios.get("http://localhost:5000/api/users/getMe", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, 
-        },
-      });
-  
-    
-    dispatch(getMeSuccess(response.data.user));
-        } catch (error: any) {
-    dispatch(getMeFailure(error.message));
+  try {
+    const response = await axios.get("http://localhost:5000/api/users/getMe", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.data.user) {
+      dispatch(getMeSuccess(response.data.user));
+    } else {
+      dispatch(getMeSuccess(response.data.user));
+      localStorage.removeItem("token");
     }
-  };
-  
-  export const logoutUser = () => (dispatch: AppDispatch) => {
+  } catch (error: any) {
+    dispatch(getMeFailure(error.message));
     localStorage.removeItem("token");
-    dispatch(logout());
-  };
+  }
+};
+
+export const logoutUser = () => (dispatch: AppDispatch) => {
+  localStorage.removeItem("token");
+  dispatch(logout());
+};
 
 export default userSlice.reducer;

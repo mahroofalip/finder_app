@@ -143,10 +143,13 @@ function App(props: Props) {
     setSelectedMenuItem("");
   }
   React.useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!user && !token) {
-      logoutFn()
-    }
+     dispatch(getMe()).then((data)=>{      
+      const token = localStorage.getItem("token");
+      if (!user && !token) {
+          logoutFn()         
+        
+      }
+     })
   }, [])
   const handleDrawerClose = () => {
     setIsClosing(true);

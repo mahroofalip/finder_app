@@ -11,7 +11,7 @@ interface ButtonWithLoaderProps {
   sx?: any; 
 }
 
-const ButtonWithLoader = ({ loading, onClick, children, variant = "contained", fullWidth = false, type = "button", sx }: ButtonWithLoaderProps) => {
+const ButtonWithLoader = ({ loading=false, onClick, children, variant = "contained", fullWidth = false, type = "button", sx }: ButtonWithLoaderProps) => {
   return (
     <Button
       variant={variant}
