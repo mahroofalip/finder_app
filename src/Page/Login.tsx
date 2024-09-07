@@ -76,7 +76,7 @@ const Login: React.FC<LoginProps> = ({ showRegisterPage, loginSubmit }) => {
 
     if (!formErrors.email && !formErrors.password) {
       setIsSubmit(true);
-      loginSubmit({ email, password, rememberMe });
+      loginSubmit({ email, password, rememberMe })
     }
   };
 

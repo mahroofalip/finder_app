@@ -13,6 +13,7 @@ import intrestsOptionsAction from './action/intrestsOptionsAction';
 import likeAction from './action/likeActions'
 import ignoreAction from './action/ignoreAction';
 import visitorActions from './action/visitorActions';
+import sideMenuAction from './action/sideMenuAction';
 
 
 
@@ -32,7 +33,8 @@ export const store = configureStore({
     pofile:profileAction,
     like:likeAction,
     ignore:ignoreAction,
-    visitor:visitorActions
+    visitor:visitorActions,
+    sideMenu:sideMenuAction
   },
 });
 
@@ -98,6 +100,7 @@ export interface ProfessionOption {
 
 
 export interface User {
+  isProfileCompleted: boolean | null;
   isLiked: boolean | null;
   password: string| null;
   phone: string| null;
@@ -213,3 +216,14 @@ export interface hairColorOptionsState {
 }
 
 
+export interface SidebarMenuOption {
+  id: number;
+  label: string;
+  icon:string;
+}
+
+export interface sidebarMenuOptionsState {
+  sidebarMenuOptions: SidebarMenuOption[] | null;
+  loading: boolean;
+  error: string | null;
+}

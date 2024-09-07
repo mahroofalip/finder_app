@@ -10,22 +10,13 @@ import List from "@mui/material/List";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ListItem from "@mui/material/ListItem";
-import HomeIcon from '@mui/icons-material/Home';
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import MenuIcon from "@mui/icons-material/Menu";
-import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
-import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import ThumbDownOffAltIcon from "@mui/icons-material/ThumbDownOffAlt";
-import BlockOutlinedIcon from "@mui/icons-material/BlockOutlined";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import SignLanguageIcon from "@mui/icons-material/SignLanguage";
-import MessageIcon from "@mui/icons-material/Message";
 import { Avatar } from "@mui/material";
-import PersonIcon from '@mui/icons-material/Person';
 import MatchesCard from "./Page/Mathes";
 import SearchingCriteria from "./Page/SearchingCriteria";
 import Visitors from "./Page/Visitors";
@@ -35,25 +26,43 @@ import Skipped from "./Page/Ignored";
 import Messages from "./Page/Messages";
 import Login from "./Page/Login";
 import Register from "./Page/Register";
-import LoginIcon from "@mui/icons-material/Login";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "./store";
 import { getMe, loginUser, logoutUser, registerUser } from "./action/authActions";
 import ProfileForm from "./Page/ProfileAndEdit";
-import socket from "./socket.ts/socket";
-import { backgroundNav, intewellToFetch } from "./consts";
+import { backgroundNav, intewellToFetch, orangeHeaderBg } from "./consts";
 import { updateUserOnlineStatus } from "./action/usersAction";
+import { loadSidebarMenuOptions } from "./action/sideMenuAction";
+import HomeIcon from '@mui/icons-material/Home';
+import SignLanguageIcon from '@mui/icons-material/SignLanguage';
+import PersonIcon from '@mui/icons-material/Person';
+import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import MessageIcon from '@mui/icons-material/Message';
+import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
+import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
+import LoginIcon from '@mui/icons-material/Login';
+
+const iconMap: { [key: string]: JSX.Element } = {
+  HomeIcon: <HomeIcon />,
+  SignLanguageIcon: <SignLanguageIcon />,
+  PersonIcon: <PersonIcon />,
+  SearchOutlinedIcon: <SearchOutlinedIcon />,
+  RemoveRedEyeIcon: <RemoveRedEyeIcon />,
+  FavoriteBorderIcon: <FavoriteBorderIcon />,
+  MessageIcon: <MessageIcon />,
+  ThumbDownOffAltIcon: <ThumbDownOffAltIcon />,
+  BlockOutlinedIcon: <BlockOutlinedIcon />,
+  LoginIcon: <LoginIcon />,
+};
+
 
 const drawerWidth = 240;
-// socket.connect();
 interface Props {
   window?: () => Window;
 }
-
 function App(props: Props) {
-
-  // useUserActivity();
-
   const dispatch: AppDispatch = useDispatch();
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -64,7 +73,7 @@ function App(props: Props) {
   const matches = useMediaQuery("(max-width:600px)");
   const me = useSelector((state: RootState) => state.auth);
   const user = useSelector((state: RootState) => state.auth.user);
-
+  const { sidebarMenuOptions } = useSelector((state: RootState) => state.sideMenu);
 
   React.useEffect(() => {
     dispatch(updateUserOnlineStatus());
@@ -76,9 +85,6 @@ function App(props: Props) {
     }, intewellToFetch);
     return () => clearInterval(intervalId);
   }, [dispatch, user, intewellToFetch]);
-
-
-
   React.useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -89,9 +95,6 @@ function App(props: Props) {
       setLoggedIn(false);
     }
   }, [user, dispatch]);
-
-
-
   const handleRegisterSubmit = (data: {
     firstName: string;
     lastName: string;
@@ -107,9 +110,10 @@ function App(props: Props) {
       email: email,
       password: password,
     };
-    dispatch(registerUser(userData));
+    dispatch(registerUser(userData)).then(() => {
+      dispatch(loadSidebarMenuOptions());
+    })
   };
-
   const handleLoginSubmit = (data: { email: string; password: string; rememberMe: boolean }) => {
     const { password, email, rememberMe } = data;
     const userData: any = {
@@ -117,11 +121,10 @@ function App(props: Props) {
       email,
       rememberMe
     };
-
-
-    dispatch(loginUser(userData));
+    dispatch(loginUser(userData)).then(() => {
+      dispatch(loadSidebarMenuOptions());
+    })
   };
-
   const displaySignUp = () => {
     setSelectedMenuItem("Matches");
     setAccountCreated(false);
@@ -129,7 +132,6 @@ function App(props: Props) {
   const displayLogin = () => {
     setAccountCreated(true);
   };
-
   const handleMenuItemClick = (text: string) => {
     if (text === "Logout") {
       logoutFn()
@@ -143,13 +145,12 @@ function App(props: Props) {
     setSelectedMenuItem("");
   }
   React.useEffect(() => {
-     dispatch(getMe()).then((data)=>{      
+    dispatch(getMe()).then(() => {
       const token = localStorage.getItem("token");
       if (!user && !token) {
-          logoutFn()         
-        
+        logoutFn()
       }
-     })
+    })
   }, [])
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -166,9 +167,9 @@ function App(props: Props) {
     }
   };
   React.useEffect(() => {
-
-    const token = localStorage.getItem("token");
-    dispatch(getMe());
+    dispatch(getMe()).then(() => {
+      dispatch(loadSidebarMenuOptions());
+    })
   }, [dispatch]);
 
   const drawer = (
@@ -196,185 +197,154 @@ function App(props: Props) {
       <Divider />
 
       <List className="bg-Body">
-        {[
-          "Posts",
-          "Profile",
-          "Matches",
-          "Search",
-          "Visitors",
-          "likes",
-          "Messages",
-          "Skipped",
-          "Blocked",
-          "Logout",
-        ].map((text, index) => (
-          <ListItem key={text} onClick={() => handleMenuItemClick(text)}>
+        {sidebarMenuOptions?.map((menu, index) => (
+          <ListItem key={menu.id} onClick={() => handleMenuItemClick(menu.label)}>
             <ListItemButton>
               <ListItemIcon>
-                {index === 0 && <HomeIcon sx={{ color: "orange" }} />}
-                {index === 1 && <PersonIcon sx={{ color: "orange" }} />}
-                {index === 2 && <SignLanguageIcon sx={{ color: "orange" }} />}
-                {index === 3 && <SearchOutlinedIcon sx={{ color: "orange" }} />}
-                {index === 4 && <RemoveRedEyeIcon sx={{ color: "orange" }} />}
-                {index === 5 && <FavoriteBorderIcon sx={{ color: "orange" }} />}
-                {index === 6 && <MessageIcon sx={{ color: "orange" }} />}
-                {index === 7 && <ThumbDownOffAltIcon sx={{ color: "orange" }} />}
-                {index === 8 && <BlockOutlinedIcon sx={{ color: "orange" }} />}
-                {index === 9 && <LoginIcon sx={{ color: "orange" }} />}
-             
-
+                {React.cloneElement(iconMap[menu.icon], { sx: { color: orangeHeaderBg } })}
               </ListItemIcon>
-              <ListItemText primary={text} />
+              <ListItemText primary={menu.label} />
             </ListItemButton>
           </ListItem>
         ))}
       </List>
     </div>
   );
-
-  // Remove this const when copying and pasting into your project.
   const container =
     window !== undefined ? () => window().document.body : undefined;
-
   return isLoggedIn ? (
-    <Box sx={{ display: "flex", }}>
-      <CssBaseline />
-      <AppBar
-        position="fixed"
-        sx={{
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` },
-          background:
-            backgroundNav,
-        }}
-      >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2,display: { sm: "none" } }}
-          
-          >
-            <MenuIcon sx={{color:'black'}} />
-          </IconButton>
-          <Typography variant="h6" noWrap sx={{ color: "orange" }} component="div">
-            {selectedMenuItem}
-          </Typography>
-        </Toolbar>
 
-      </AppBar>
+    user?.isProfileCompleted ?
 
-      <Box
-        component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-        aria-label="mailbox folders"
-      >
-        <Drawer
-          container={container}
-          variant="temporary"
-          open={mobileOpen}
-          onTransitionEnd={handleDrawerTransitionEnd}
-          onClose={handleDrawerClose}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
+      <Box sx={{ display: "flex", }}>
+        <CssBaseline />
+        <AppBar
+          position="fixed"
           sx={{
-            // display: { xs: 'block', sm: 'none' },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: drawerWidth,
-            },
+            width: { sm: `calc(100% - ${drawerWidth}px)` },
+            ml: { sm: `${drawerWidth}px` },
+            background:
+              backgroundNav,
           }}
         >
-          {drawer}
-        </Drawer>
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: "none", sm: "block" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: drawerWidth,
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2, display: { sm: "none" } }}
 
-            },
-          }}
-
-          open
-        >
-          <Toolbar sx={{ background: backgroundNav }}>
-
-            <Avatar
-              alt={`${me?.user?.firstName} ${me?.user?.lastName}`}
-              src={me?.user?.profileImage || "https://pics.craiyon.com/2023-11-26/oMNPpACzTtO5OVERUZwh3Q.webp"} />
-            <FavoriteBorderIcon sx={{ fontWeight: "bold", marginLeft: "20px", color: "orange" }} />
-            <Typography
-              sx={{ fontWeight: "bold", marginLeft: "5px", color: "orange" }}
             >
-              {"Finder"}
+              <MenuIcon sx={{ color: 'black' }} />
+            </IconButton>
+            <Typography variant="h6" noWrap sx={{ color: "orange" }} component="div">
+              {selectedMenuItem}
             </Typography>
-
-
-
           </Toolbar>
 
-          {drawer}
-        </Drawer>
-      </Box>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-        }}
-      >
-        <Toolbar />
-        {selectedMenuItem === "Profile" && (
-          <>
+        </AppBar>
+
+        <Box
+          component="nav"
+          sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+          aria-label="mailbox folders"
+        >
+          <Drawer
+            container={container}
+            variant="temporary"
+            open={mobileOpen}
+            onTransitionEnd={handleDrawerTransitionEnd}
+            onClose={handleDrawerClose}
+            ModalProps={{
+              keepMounted: true,
+            }}
+            sx={{
+              "& .MuiDrawer-paper": {
+                boxSizing: "border-box",
+                width: drawerWidth,
+              },
+            }}
+          >
+            {drawer}
+          </Drawer>
+          <Drawer
+            variant="permanent"
+            sx={{
+              display: { xs: "none", sm: "block" },
+              "& .MuiDrawer-paper": {
+                boxSizing: "border-box",
+                width: drawerWidth,
+
+              },
+            }}
+
+            open
+          >
+            <Toolbar sx={{ background: backgroundNav }}>
+
+              <Avatar
+                alt={`${me?.user?.firstName} ${me?.user?.lastName}`}
+                src={me?.user?.profileImage || "https://pics.craiyon.com/2023-11-26/oMNPpACzTtO5OVERUZwh3Q.webp"} />
+              <FavoriteBorderIcon sx={{ fontWeight: "bold", marginLeft: "20px", color: "orange" }} />
+              <Typography
+                sx={{ fontWeight: "bold", marginLeft: "5px", color: "orange" }}
+              >
+                {"Finder"}
+              </Typography>
+            </Toolbar>
+            {drawer}
+          </Drawer>
+        </Box>
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            p: 3,
+            width: { sm: `calc(100% - ${drawerWidth}px)` },
+          }}
+        >
+          <Toolbar />
+          {selectedMenuItem === "Profile" && (
             <ProfileForm />
-          </>
-        )}
 
-        {selectedMenuItem === "Matches" && (
-          <>
+          )}
+          {selectedMenuItem === "Matches" && (
             <MatchesCard />
-          </>
-        )}
-        {selectedMenuItem === "Search" && (
-          <>
-            <SearchingCriteria />
-          </>
-        )}
-        {selectedMenuItem === "Visitors" && (
-          <>
-            <Visitors />
-          </>
-        )}
 
-        {selectedMenuItem === "likes" && (
-          <>
+          )}
+          {selectedMenuItem === "Search" && (
+            <SearchingCriteria />
+
+          )}
+          {selectedMenuItem === "Visitors" && (
+            <Visitors />
+          )}
+
+          {selectedMenuItem === "likes" && (
             <Likes />
-          </>
-        )}
-        {selectedMenuItem === "Messages" && (
-          <>
+          )}
+          {selectedMenuItem === "Messages" && (
             <Messages />
-          </>
-        )}
-        {selectedMenuItem === "Skipped" && (
-          <>
+          )}
+          {selectedMenuItem === "Skipped" && (
             <Skipped />
-          </>
-        )}
-        {selectedMenuItem === "Blocked" && (
-          <>
+
+          )}
+          {selectedMenuItem === "Blocked" && (
             <Blocked />
-          </>
-        )}
-      </Box>
-    </Box>
+          )}
+          {selectedMenuItem === "Posts" && (
+            <>
+
+              Posts
+
+            </>
+          )}
+
+        </Box>
+      </Box> : !user?.isProfileCompleted &&   <ProfileForm />
+
   ) : (
     <>
       <Box sx={{ display: "flex" }}>
