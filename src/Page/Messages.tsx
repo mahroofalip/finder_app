@@ -9,7 +9,7 @@ import Typography from "@mui/material/Typography";
 import ChatPage from "./ChatPage";
 import BlockIcon from '@mui/icons-material/Block';
 import { loadUserChats } from "../action/messageActions";
-import { useDispatch } from "react-redux";
+import {  useDispatch } from "react-redux";
 import { AppDispatch, Message, RootState } from "../store";
 import { useSelector } from "react-redux";
 import socket from "../socket.ts/socket";
@@ -61,10 +61,18 @@ const Messages: React.FC = () => {
 
     socket.on("blocked-you-user", (data: any) => {
       if (user?.id === data?.blockedId) {
-        nullfyUserSelect()
+        nullfyUserSelect();
         setBlockAlert(data?.message);
         dispatch(loadUserChats());
         playSound();
+        
+        // Automatically hide the alert after 5 seconds
+        const timer = setTimeout(() => {
+          setBlockAlert(null);
+        }, 5000);
+  
+        // Cleanup the timer when the component unmounts or blockAlert changes
+        return () => clearTimeout(timer);
       }
     });
   }, [dispatch]);
