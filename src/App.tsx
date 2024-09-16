@@ -30,7 +30,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "./store";
 import { getMe, loginUser, logoutUser, registerUser } from "./action/authActions";
 import ProfileForm from "./Page/ProfileAndEdit";
-import { backgroundNav, intewellToFetch, orangeHeaderBg } from "./consts";
+import { appname, backgroundNav, intewellToFetch, orangeHeaderBg } from "./consts";
 import { updateUserOnlineStatus } from "./action/usersAction";
 import { loadSidebarMenuOptions } from "./action/sideMenuAction";
 import HomeIcon from '@mui/icons-material/Home';
@@ -186,7 +186,7 @@ function App(props: Props) {
           <Typography
             sx={{ fontWeight: "bold", marginLeft: "5px", color: "#f516e6" }}
           >
-            {"SoulSpark"}
+            {appname}
           </Typography>
           <IconButton style={{ marginLeft: "10px" }} aria-label="delete">
             <SettingsIcon />
@@ -290,7 +290,7 @@ function App(props: Props) {
               <Typography
                 sx={{ fontWeight: "bold", marginLeft: "5px", color: "orange" }}
               >
-                {"SoulSpark"}
+              {appname}
               </Typography>
             </Toolbar>
             {drawer}

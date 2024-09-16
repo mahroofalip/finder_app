@@ -12,7 +12,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import ButtonWithLoader from "../ButtonWithLoader";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
-import { orangeHeaderBg } from "../consts";
+import { appname, orangeHeaderBg } from "../consts";
 
 function Copyright(props: any) {
   return (
@@ -24,7 +24,7 @@ function Copyright(props: any) {
     >
       {"Copyright © "}
       <Link color="inherit" href="https://mui.com/">
-        www.soulspark.comf
+        www.{appname}.com
       </Link>{" "}
       {new Date().getFullYear()}
       {"."}
