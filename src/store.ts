@@ -227,3 +227,13 @@ export interface sidebarMenuOptionsState {
   loading: boolean;
   error: string | null;
 }
+export interface SearchFields {
+  age: number[] | null; // Update to accept an array of numbers
+  gender: string;
+  name:string;
+  height: number[] | null;
+  weight: number[] | null;
+  eycolor: string;
+  
+  location: string;
+}

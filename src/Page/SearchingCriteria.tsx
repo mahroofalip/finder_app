@@ -18,6 +18,9 @@ import SearchIcon from "@mui/icons-material/Search";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import MatchesCard from "./Mathes";
 import { orangeHeaderBg } from "../consts";
+import { useSelector } from "react-redux";
+import { RootState, SearchFields } from "../store";
+import GooglePlacesAutocomplete from "../components/AutoComplete/GoogleLocation";
 
 function valuetext(value: any) {
   return `${value}°C`;
@@ -26,6 +29,18 @@ function valuetext(value: any) {
 export default function SearchingCriteria() {
   const [value, setValue] = useState([20, 37]);
   const [gender, setGender] = React.useState("");
+  const [errors, setErrors] = useState<Partial<Record<keyof SearchFields, string>>>({});
+  const [searchFields, setSearchFields] = useState<SearchFields>({
+    age: null,
+    gender: "",
+    location: '',
+    name: "",
+    eycolor:"",
+    height:null,
+    weight:null,
+    
+  });
+  const { genderOptions } = useSelector((state: RootState) => state.genderOption);
   const matches = useMediaQuery("(max-width:600px)");
   const [searched, setSearch] = React.useState(false);
   const onSearch = () => {
@@ -34,25 +49,47 @@ export default function SearchingCriteria() {
   const handleGender = (event: any) => {
     setGender(event.target.value);
   };
-  const handleChange = (event: any, newValue: any) => {
-    setValue(newValue);
+
+  const handlePlaceSelect = (place: any | null) => {
+    setSearchFields((prevSerchFields) => ({ ...prevSerchFields, place }));
+    // setErrors((prevErrors) => ({ ...prevErrors, place: '' })); // Clear the place error
+    // validate()
   };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setSearchFields((prevSearchFields) => ({ ...prevSearchFields, [name]: value }));
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: '' })); // Clear the error for the changed field
+    validate()
+  };
+  const validate = () => {
+
+    let tempErrors: Partial<Record<keyof SearchFields, string>> = {};
+
+  
+  };
+const handleSliderChange = (event: Event, newValue: number | number[]) => {
+  setValue(newValue as number[]);
+  setSearchFields((prevSearchFields) => ({
+    ...prevSearchFields,
+    age: newValue as number[], 
+  }));
+};
 
   return (
     <>
       {!searched ? (
         <Box sx={{ border: 3, borderColor: orangeHeaderBg }}>
           <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                background: orangeHeaderBg,
-                color: "white",
-              }}
-            >
-              Search Criteria
-            </div>
-         
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              background: orangeHeaderBg,
+              color: "white",
+            }}
+          >
+            Search Criteria
+          </div>
+
           <Grid
             sx={{ p: 2 }}
             container
@@ -60,14 +97,55 @@ export default function SearchingCriteria() {
             columnSpacing={{ xs: 1, sm: 2, md: 3 }}
           >
             <Grid item sm={12} xs={12} lg={6}>
+              <FormControl fullWidth >
+                <label>Gender</label>
+                <TextField
+                  select
+                  name="gender"
+                  size="small"
+                  id="gender"
+                  value={searchFields.gender}
+                  onChange={handleChange}
+                  fullWidth
+                >
+                  {genderOptions.map((option: any) => (
+                    <MenuItem key={option.id} value={option.gender}>
+                      {option.gender}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                {errors.gender && (
+                  <Typography color="error" variant="body2">
+                    {errors.gender}
+                  </Typography>
+                )}
+              </FormControl>
+
+            </Grid>
+            <Grid item sm={12} xs={12} lg={6}>
+            <label>Location</label>
+              <GooglePlacesAutocomplete initialValue={searchFields.location}
+                onSelect={handlePlaceSelect} />
+            </Grid>
+            <Grid item sm={12} xs={12} lg={6}>
+            <label>Location</label>
+              <GooglePlacesAutocomplete initialValue={searchFields.location}
+                onSelect={handlePlaceSelect} />
+            </Grid>
+            <Grid item sm={12} xs={12} lg={6}>
+            <label>Location</label>
+              <GooglePlacesAutocomplete initialValue={searchFields.location}
+                onSelect={handlePlaceSelect} />
+            </Grid>
+            <Grid item sm={12} xs={12} lg={6}>
               <Typography >
                 {/* align="end" */}
-                {value[0]} - {value[1]}{" "}
+                <label>Age</label> {value[0]} - {value[1]}{" "}
               </Typography>
               <Slider
                 getAriaLabel={() => "Age"}
                 value={value}
-                onChange={handleChange}
+                onChange={handleSliderChange} // Use the correct handler for Slider
                 valueLabelDisplay="auto"
                 getAriaValueText={valuetext}
                 max={50}
@@ -87,56 +165,6 @@ export default function SearchingCriteria() {
               />
             </Grid>
             <Grid item sm={12} xs={12} lg={6}>
-              <Autocomplete
-                multiple
-                id="tags-outlined"
-                options={top100Films}
-                getOptionLabel={(option) => option.title}
-                defaultValue={[top100Films[1]]}
-                filterSelectedOptions
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Location"
-                    placeholder="Favorites"
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item sm={12} xs={12} lg={6}>
-              <FormControl fullWidth >
-                <InputLabel id="demo-select-small-label">Gender</InputLabel>
-                <Select
-                  labelId="demo-select-small-label"
-                  id="demo-select-small"
-                  value={gender}
-                  label="Gender"
-                  fullWidth
-                  onChange={handleGender}
-                >
-                  <MenuItem value={"Male"}>Male</MenuItem>
-                  <MenuItem value={"Female"}>Female</MenuItem>
-                  <MenuItem value={"Transgender"}>Transgender</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item sm={12} xs={12} lg={6}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    defaultChecked
-                    sx={{
-                      '& .MuiSwitch-switchBase.Mui-checked': {
-                        color: orangeHeaderBg, // Thumb color when checked
-                      },
-                      '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                        backgroundColor: orangeHeaderBg, // Track color when checked
-                      },
-                    }}
-                  />
-                }
-                label="Show profiles with photos only"
-              />
 
             </Grid>
             <Grid item sm={12} xs={12} lg={12}>
@@ -200,7 +228,7 @@ export default function SearchingCriteria() {
           >
             Search Results
           </div>
-          <MatchesCard />
+          {/* <MatchesCard /> */}
         </Box>
       )}
     </>
