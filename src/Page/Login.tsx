@@ -16,18 +16,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { orangeHeaderBg } from '../consts';
 
-function Copyright(props: any) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="#">
-        www.finder.com
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+
 
 interface LoginProps {
   showRegisterPage: () => void;
@@ -207,7 +196,7 @@ const Login: React.FC<LoginProps> = ({ showRegisterPage, loginSubmit }) => {
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
+        {/* <Copyright sx={{ mt: 8, mb: 4 }} /> */}
       </Container>
     </ThemeProvider>
   );

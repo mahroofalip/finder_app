@@ -186,7 +186,7 @@ function App(props: Props) {
           <Typography
             sx={{ fontWeight: "bold", marginLeft: "5px", color: "#f516e6" }}
           >
-            {"Finder"}
+            {"SoulSpark"}
           </Typography>
           <IconButton style={{ marginLeft: "10px" }} aria-label="delete">
             <SettingsIcon />
@@ -290,7 +290,7 @@ function App(props: Props) {
               <Typography
                 sx={{ fontWeight: "bold", marginLeft: "5px", color: "orange" }}
               >
-                {"Finder"}
+                {"SoulSpark"}
               </Typography>
             </Toolbar>
             {drawer}

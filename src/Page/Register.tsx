@@ -24,7 +24,7 @@ function Copyright(props: any) {
     >
       {"Copyright © "}
       <Link color="inherit" href="https://mui.com/">
-        www.finder.com
+        www.soulspark.comf
       </Link>{" "}
       {new Date().getFullYear()}
       {"."}
@@ -331,7 +331,7 @@ const Register: React.FC<RegisterProps> = ({ showLoginPage, signUpSubmit }) => {
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 5 }} />
+        {/* <Copyright sx={{ mt: 5 }} /> */}
       </Container>
     </ThemeProvider>
   );
