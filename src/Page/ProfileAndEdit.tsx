@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import imageCompression from 'browser-image-compression';
 import { Grid, TextField, Button, MenuItem, Paper, Avatar, IconButton, Typography, Autocomplete, Chip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { AppDispatch, RootState } from '../store';
@@ -118,17 +119,17 @@ const ProfileForm: React.FC = () => {
     email: '',
     phone: '',
     profileImage: '',
-    dob: '',
-    height: '',
-    weight: '',
-    eyeColor: '',
-    hairColor: '',
-    education: '',
-    gender: '',
-    profession: '',
-    displayName: '',
-    description: '',
-    place: '',
+    dob: '19/04/1998',
+    height: '55',
+    weight: '44',
+    eyeColor: 'Blue',
+    hairColor: 'Blue',
+    education: 'Bsc',
+    gender: 'Female',
+    profession: 'Artist',
+    displayName: 'Deep',
+    description: 'Hi im Deepika',
+    place: 'Mumbai',
     interests: [],
     lookingFor: [],
     profileExt: '',
@@ -181,24 +182,35 @@ const ProfileForm: React.FC = () => {
     fileInputRef.current?.click();
   };
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const fileExtension = file.name.split('.').pop(); // Extract file extension
-        setProfile((prevProfile) => ({
-          ...prevProfile,
-          profileImage: reader.result as string,
-          profileExt: fileExtension || '' // Add file extension to the state
-        }));
-        setErrors((prevErrors) => ({ ...prevErrors, profileImage: '' })); // Clear the avatar error
-        validate();
-      };
+      try {
+        const options = {
+          maxSizeMB: 1, // Limit the image size to 1MB
+          maxWidthOrHeight: 800, // Resize the image to a max dimension
+          useWebWorker: true,
+        };
 
-      reader.readAsDataURL(file);
+        const compressedFile = await imageCompression(file, options);
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          const fileExtension = compressedFile.name.split('.').pop();
+          setProfile((prevProfile) => ({
+            ...prevProfile,
+            profileImage: reader.result as string,
+            profileExt: fileExtension || ''
+          }));
+        };
+
+        reader.readAsDataURL(compressedFile);
+      } catch (error) {
+        console.error('Error compressing the image:', error);
+      }
     }
   };
+
   const handleSearchAndChangeOptions = (
     e: React.ChangeEvent<HTMLTextAreaElement> | { target: { name: string; value: string[] | string } }
   ) => {
@@ -311,28 +323,28 @@ const ProfileForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (validate()) {
-      try {
+    // if (validate()) {
+    try {
 
 
-        await dispatch(updateUserProfile(profile));
-        // Show success alert
-        const token = localStorage.getItem("token");
+      await dispatch(updateUserProfile(profile));
+      // Show success alert
+      const token = localStorage.getItem("token");
 
 
-        setAlertMessage('Your profile has been updated successfully!');
-        setAlertSeverity('success');
-        dispatch(getMe());
-        setAlertIcon(<CheckIcon fontSize="inherit" />);
+      setAlertMessage('Your profile has been updated successfully!');
+      setAlertSeverity('success');
+      dispatch(getMe());
+      setAlertIcon(<CheckIcon fontSize="inherit" />);
 
 
-      } catch (error) {
-        // Show error alert
-        setAlertMessage('There was an error updating your profile.');
-        setAlertSeverity('error');
-        setAlertIcon(<ErrorIcon fontSize="inherit" />);
-      }
+    } catch (error) {
+      // Show error alert
+      setAlertMessage('There was an error updating your profile.');
+      setAlertSeverity('error');
+      setAlertIcon(<ErrorIcon fontSize="inherit" />);
     }
+    // }
   };
 
   useEffect(() => {
@@ -367,7 +379,7 @@ const ProfileForm: React.FC = () => {
                 }}
                 onClick={handleAvatarClick}
               >
-                <EditIcon sx={{color:orangeHeaderBg}}/>
+                <EditIcon sx={{ color: orangeHeaderBg }} />
               </IconButton>
               <input
                 type="file"
