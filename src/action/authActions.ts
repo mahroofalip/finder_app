@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import axios from "axios";
 import { AppDispatch, User, AuthState } from "../store";
+import { BASE_URL } from "../consts";
 
 const initialState: AuthState = {
   user: null,
@@ -77,7 +78,7 @@ export const loginUser = (userData: User) => async (dispatch: AppDispatch) => {
   dispatch(loginStart());
   try {
     const response = await axios.post(
-      "http://localhost:5000/api/auth/login",
+      `${BASE_URL}/api/auth/login`,
       userData,
       {
         headers: {
@@ -99,7 +100,7 @@ export const registerUser =
     dispatch(registerStart());
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/register",
+        `${BASE_URL}//api/auth/register`,
         userData,
         {
           headers: {
@@ -127,7 +128,7 @@ export const getMe = () => async (dispatch: AppDispatch) => {
   const token = localStorage.getItem("token");
   dispatch(getMeStart());
   try {
-    const response = await axios.get("http://localhost:5000/api/users/getMe", {
+    const response = await axios.get(`${BASE_URL}/api/users/getMe`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,

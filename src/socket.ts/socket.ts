@@ -1,7 +1,8 @@
 import { io, Socket } from 'socket.io-client';
+import { BASE_URL } from '../consts';
 
 // Create the socket instance
-const socket: Socket = io('http://localhost:5000', { 
+const socket: Socket = io(`${BASE_URL}`, { 
   withCredentials: true,
   transports: ["websocket"], // Ensures it only uses WebSocket
 });

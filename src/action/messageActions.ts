@@ -5,6 +5,7 @@ import axios from 'axios';
 import { AppDispatch, Chat, Message, MessageState, RootState } from '../store';
 import { useSelector } from 'react-redux';
 import socket from '../socket.ts/socket';
+import { BASE_URL } from '../consts';
 
 
 const initialState: MessageState = {
@@ -91,7 +92,7 @@ export const sendMessage = (newMessage: any, roomId: any, userId: any) => async 
     try {
 
         const token = localStorage.getItem('token'); // Retrieve the token from local storage
-        const response = await axios.post('http://localhost:5000/api/messages/createNewMessage', { newMessage, roomId }, {
+        const response = await axios.post(`${BASE_URL}/api/messages/createNewMessage`, { newMessage, roomId }, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}` // Include the token in the Authorization header
@@ -110,7 +111,7 @@ export const loadUserChats = () => async (dispatch: AppDispatch) => {
     const token = localStorage.getItem('token'); // Retrieve the token from local storage
     dispatch(loadUserChatsStart());
     try {
-        const response = await axios.get(`http://localhost:5000/api/messages/getUserChats`, {
+        const response = await axios.get(`${BASE_URL}/api/messages/getUserChats`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}` // Include the token in the Authorization header
@@ -126,7 +127,7 @@ export const createRoom = (sender_id: any, receiver_id: any, message_content: an
     dispatch(createRoomStart());
     try {
         const token = localStorage.getItem('token');
-        const response = await axios.post('http://localhost:5000/api/messages/createRoomAndSendMessage', { receiver_id, sender_id, message_content }, {
+        const response = await axios.post(`${BASE_URL}/api/messages/createRoomAndSendMessage`, { receiver_id, sender_id, message_content }, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}` // Include the token in the Authorization header
@@ -142,7 +143,7 @@ export const getMessagesByRoomId = (roomId: Message) => async (dispatch: AppDisp
     dispatch(receiveMessageStart());
     try {
         const token = localStorage.getItem('token'); // Retrieve the token from local storage
-        const response = await axios.post('http://localhost:5000/api/messages/getMessagesByRoomId', { roomId }, {
+        const response = await axios.post(`${BASE_URL}/api/messages/getMessagesByRoomId`, { roomId }, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}` // Include the token in the Authorization header

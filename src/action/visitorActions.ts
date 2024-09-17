@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { AppDispatch, User, visitorState } from '../store';
+import { BASE_URL } from '../consts';
 const initialState: visitorState = {
     visitor: null,
     visitors: null,
@@ -52,7 +53,7 @@ export const addVisitor = (visitorData: { profileId: number }) => async (dispatc
     const token = localStorage.getItem("token");
     try {
         const response = await axios.post(
-            "http://localhost:5000/api/visitor/add-visitor",
+            `${BASE_URL}/api/visitor/add-visitor`,
             visitorData,
             {
                 headers: {
@@ -71,7 +72,7 @@ export const getVisitors = () => async (dispatch: AppDispatch) => {
     const token = localStorage.getItem("token");
     try {
         const response = await axios.get(
-            `http://localhost:5000/api/visitor/get-visitorUser`,
+            `${BASE_URL}/api/visitor/get-visitorUser`,
             {
                 headers: {
                     "Content-Type": "application/json",

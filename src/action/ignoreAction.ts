@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { AppDispatch, ignoreState, User } from '../store';
+import { BASE_URL } from '../consts';
 
 const initialState: ignoreState = {
     ignoredUser: null,
@@ -64,7 +65,7 @@ export const ignoreUser = (ignoreData: { profileId: number }) => async (dispatch
 
     try {
         const response = await axios.post(
-            "http://localhost:5000/api/ignore/ignoreUser",
+            `${BASE_URL}/api/ignore/ignoreUser`,
             ignoreData,
             {
                 headers: {
@@ -85,7 +86,7 @@ export const getIgnoredProfileForUser = () => async (dispatch: AppDispatch) => {
     const token = localStorage.getItem("token");
     try {
         const response = await axios.get(
-            `http://localhost:5000/api/ignore/getIgnoredUser`,
+            `${BASE_URL}/api/ignore/getIgnoredUser`,
             {
                 headers: {
                     "Content-Type": "application/json",

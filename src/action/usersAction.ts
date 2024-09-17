@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { AppDispatch, User, UserState, } from '../store';
+import { BASE_URL } from '../consts';
 
 const initialState: UserState = {
     users: [],
@@ -52,7 +53,7 @@ export const loadFinderUsers = () => async (dispatch: AppDispatch) => {
     const token = localStorage.getItem('token'); // Retrieve the token from local storage
     dispatch(loadUsersStart());
     try {
-        const response = await axios.get('http://localhost:5000/api/users/getUsers', {
+        const response = await axios.get(`${BASE_URL}/api/users/getUsers`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}` // Include the token in the Authorization header
@@ -69,7 +70,7 @@ export const updateUserOnlineStatus =
         const token = localStorage.getItem("token");
         if (token) {
             axios.get(
-                "http://localhost:5000/api/users/update-online",
+                `${BASE_URL}/api/users/update-online`,
                 {
                     headers: {
                         "Content-Type": "application/json",

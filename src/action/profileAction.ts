@@ -4,6 +4,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { AppDispatch, User, UserState, } from '../store';
+import { BASE_URL } from '../consts';
 
 const initialState: UserState = {
   users: [],
@@ -108,7 +109,7 @@ export const getBlockedProfiles = () => async (dispatch: AppDispatch) => {
   const token = localStorage.getItem("token");
   try {
     const response = await axios.get(
-      `http://localhost:5000/api/users/get-blocked-profies`,
+      `${BASE_URL}/api/users/get-blocked-profies`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -127,7 +128,7 @@ export const unBlockUser = (profileId: any) => async (dispatch: AppDispatch) => 
 
   try {
     const response = await axios.put(
-      "http://localhost:5000/api/users/unblock-profile",
+      `${BASE_URL}//api/users/unblock-profile`,
       { profileId },
       {
         headers: {
@@ -149,7 +150,7 @@ export const blockUser = (roomId:any,profileId: any) => async (dispatch: AppDisp
 
   try {
     const response = await axios.put(
-      "http://localhost:5000/api/users/block-profile",
+     `${BASE_URL}/api/users/block-profile`,
       { profileId,roomId },
       {
         headers: {
@@ -172,7 +173,7 @@ export const updateUserProfile =
 
     try {
       const response = await axios.put(
-        "http://localhost:5000/api/users/update-user",
+        `${BASE_URL}/api/users/update-user`,
         profile,
         {
           headers: {
@@ -192,7 +193,7 @@ export const getProfile = (profileId: any) => async (dispatch: AppDispatch) => {
   const token = localStorage.getItem("token");
   dispatch(getProfileStart());
   try {
-    const response = await axios.get(`http://localhost:5000/api/users/profile/${profileId}`, {
+    const response = await axios.get(`${BASE_URL}/api/users/profile/${profileId}`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,

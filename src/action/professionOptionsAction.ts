@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { AppDispatch, ProfessionOption, professionOptionsState } from '../store';
+import { BASE_URL } from '../consts';
 
 const initialState: professionOptionsState = {
     professionOptions: [],
@@ -37,7 +38,7 @@ export const loadProfessionOptions = () => async (dispatch: AppDispatch) => {
     const token = localStorage.getItem('token'); // Retrieve the token from local storage
     dispatch(loadProfessionOptionsStart());
     try {
-        const response = await axios.get('http://localhost:5000/api/common/profession-list', {
+        const response = await axios.get(`${BASE_URL}/api/common/profession-list`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}` // Include the token in the Authorization header

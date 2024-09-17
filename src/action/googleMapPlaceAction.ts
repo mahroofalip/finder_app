@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { AppDispatch , googlemapPlaceOptionsState, PlacesOption,  } from '../store';
 import { loadProfessionOptionsFailure, loadProfessionOptionsStart, loadProfessionOptionsSuccess } from './professionOptionsAction';
+import { BASE_URL } from '../consts';
 
 const initialState: googlemapPlaceOptionsState = {
     places: [],
@@ -38,7 +39,7 @@ export const loadGooglePlaces = (input:string) => async (dispatch: AppDispatch) 
     const token = localStorage.getItem('token'); // Retrieve the token from local storage
     dispatch(loadGooglePlacesOptionsStart());
     try {
-        const response = await axios.get('http://localhost:5000/api/map/places', {
+        const response = await axios.get(`${BASE_URL}/api/map/places`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}` // Include the token in the Authorization header

@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { AppDispatch, IntrestOptionsState, IntrestsOption } from '../store';
+import { BASE_URL } from '../consts';
 
 const initialState: IntrestOptionsState = {
     intrestsOptions: [],
@@ -37,7 +38,7 @@ export const loadIntrestsOptions = () => async (dispatch: AppDispatch) => {
     const token = localStorage.getItem('token'); 
     dispatch(loadIntrestOptionsStart());
     try {
-        const response = await axios.get('http://localhost:5000/api/common/interests-list', {
+        const response = await axios.get(`${BASE_URL}/api/common/interests-list`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}` 

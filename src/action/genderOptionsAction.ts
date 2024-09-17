@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { AppDispatch, GenderOption, genderOptionsState,  } from '../store';
 import { loadProfessionOptionsFailure, loadProfessionOptionsStart, loadProfessionOptionsSuccess } from './professionOptionsAction';
+import { BASE_URL } from '../consts';
 
 const initialState: genderOptionsState = {
     genderOptions: [],
@@ -38,7 +39,7 @@ export const loadGenderOptions = () => async (dispatch: AppDispatch) => {
     const token = localStorage.getItem('token'); // Retrieve the token from local storage
     dispatch(loadGenderOptionsStart());
     try {
-        const response = await axios.get('http://localhost:5000/api/common/genders-list', {
+        const response = await axios.get(`${BASE_URL}/api/common/genders-list`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}` // Include the token in the Authorization header

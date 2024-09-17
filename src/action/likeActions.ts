@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { AppDispatch, likeState, User } from '../store';
+import { BASE_URL } from '../consts';
 
 const initialState: likeState = {
     like: null,
@@ -61,7 +62,7 @@ export const addLike = (likeData: { profileId: number }) => async (dispatch: App
 
     try {
         const response = await axios.post(
-            "http://localhost:5000/api/like/addlike",
+            `${BASE_URL}/api/like/addlike`,
             likeData,
             {
                 headers: {
@@ -81,7 +82,7 @@ export const getLikesForUser = () => async (dispatch: AppDispatch) => {
     const token = localStorage.getItem("token");
     try {
         const response = await axios.get(
-            `http://localhost:5000/api/like/getlikeuser`,
+            `${BASE_URL}/api/like/getlikeuser`,
             {
                 headers: {
                     "Content-Type": "application/json",
