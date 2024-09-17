@@ -128,7 +128,7 @@ export const unBlockUser = (profileId: any) => async (dispatch: AppDispatch) => 
 
   try {
     const response = await axios.put(
-      `${BASE_URL}//api/users/unblock-profile`,
+      `${BASE_URL}/api/users/unblock-profile`,
       { profileId },
       {
         headers: {

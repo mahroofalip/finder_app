@@ -100,7 +100,7 @@ export const registerUser =
     dispatch(registerStart());
     try {
       const response = await axios.post(
-        `${BASE_URL}//api/auth/register`,
+        `${BASE_URL}/api/auth/register`,
         userData,
         {
           headers: {

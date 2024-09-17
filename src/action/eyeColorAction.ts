@@ -38,7 +38,7 @@ export const loadEyeColorOptions = () => async (dispatch: AppDispatch) => {
     const token = localStorage.getItem('token'); // Retrieve the token from local storage
     dispatch(loadEyeColorOptionsStart());
     try {
-        const response = await axios.get(`${BASE_URL}//api/common/eye-color-list`, {
+        const response = await axios.get(`${BASE_URL}/api/common/eye-color-list`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}` // Include the token in the Authorization header
