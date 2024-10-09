@@ -128,13 +128,17 @@ export const getMe = () => async (dispatch: AppDispatch) => {
   const token = localStorage.getItem("token");
   dispatch(getMeStart());
   try {
+    console.log("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk a");
+
+
     const response = await axios.get(`${BASE_URL}/api/users/getMe`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     });
-
+   console.log(response,"kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk s");
+   
     if (response.data.user) {
       dispatch(getMeSuccess(response.data.user));
     } else {
@@ -142,6 +146,8 @@ export const getMe = () => async (dispatch: AppDispatch) => {
       localStorage.removeItem("token");
     }
   } catch (error: any) {
+    console.log(error.message,"kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk");
+    
     dispatch(getMeFailure(error.message));
     localStorage.removeItem("token");
   }
