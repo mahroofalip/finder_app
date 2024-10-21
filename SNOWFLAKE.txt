@@ -1,0 +1,13 @@
+resource monitor
+secure view
+Materialized Views
+
+
+doubt
+
+True/False: If you create more than one virtual warehouse, they will share the memory and CPU resources. -
+True or False: The ACCOUNT_USAGE views contain information on objects that have been deleted. -
+For how long a query remains visible on the query history page in the Snowsight interface? -
+Which of the following is correct regarding a directory table?
+
+Select all that apply. -

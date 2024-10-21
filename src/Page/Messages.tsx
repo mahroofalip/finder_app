@@ -56,6 +56,7 @@ const Messages: React.FC = () => {
 
   React.useEffect(() => {
     socket.on("receive-message", (data: Message) => {
+      alert('socket called')
       dispatch(loadUserChats());
     });
 
